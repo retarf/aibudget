@@ -13,7 +13,12 @@ import { useState } from "react";
 import { Link, useParams } from "react-router";
 
 import { ApiError, api } from "../api/client";
-import type { Transaction, TransactionInput } from "../api/types";
+import type {
+  Category,
+  CategoryCreate,
+  Transaction,
+  TransactionInput,
+} from "../api/types";
 import { TransactionForm } from "../components/TransactionForm";
 import { useApiResource } from "../hooks/useApiResource";
 
@@ -62,6 +67,12 @@ export function BudgetDetailPage() {
     await api.deleteTransaction(deleting.id);
     setDeleting(null);
     transactions.reload();
+  }
+
+  async function handleCreateCategory(data: CategoryCreate): Promise<Category> {
+    const created = await api.createCategory(data);
+    categories.reload();
+    return created;
   }
 
   return (
@@ -153,6 +164,7 @@ export function BudgetDetailPage() {
           error={formError}
           submitting={submitting}
           onSubmit={handleSubmit}
+          onCreateCategory={handleCreateCategory}
         />
       </Modal>
 

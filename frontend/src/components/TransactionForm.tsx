@@ -1,12 +1,15 @@
 import { Button, Group, NumberInput, Select, Stack, TextInput } from "@mantine/core";
 import { type FormEvent, useState } from "react";
 
+import { ApiError } from "../api/client";
 import type {
   Category,
+  CategoryCreate,
   Transaction,
   TransactionInput,
   TransactionType,
 } from "../api/types";
+import { InlineCategoryCreator } from "./InlineCategoryCreator";
 
 interface Props {
   categories: Category[];
@@ -14,6 +17,8 @@ interface Props {
   error?: string;
   submitting?: boolean;
   onSubmit: (data: TransactionInput) => void;
+  /** When provided, the form can create a new category inline. */
+  onCreateCategory?: (data: CategoryCreate) => Promise<Category>;
 }
 
 /** Create/edit form for a transaction within a budget. */
@@ -23,6 +28,7 @@ export function TransactionForm({
   error,
   submitting,
   onSubmit,
+  onCreateCategory,
 }: Props) {
   const [type, setType] = useState<TransactionType>(initial?.type ?? "expense");
   const [amount, setAmount] = useState<string>(initial?.amount ?? "");
@@ -30,6 +36,10 @@ export function TransactionForm({
   const [categoryId, setCategoryId] = useState<string | null>(
     initial ? String(initial.category_id) : null,
   );
+
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [creatingCategory, setCreatingCategory] = useState(false);
+  const [categoryError, setCategoryError] = useState<string>();
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -39,6 +49,26 @@ export function TransactionForm({
       date,
       category_id: Number(categoryId),
     });
+  }
+
+  async function handleCreateCategory(data: CategoryCreate) {
+    if (!onCreateCategory) {
+      return;
+    }
+    setCreatingCategory(true);
+    setCategoryError(undefined);
+    try {
+      const created = await onCreateCategory(data);
+      // Select the new category; other transaction fields are left untouched.
+      setCategoryId(String(created.id));
+      setAddingCategory(false);
+    } catch (err) {
+      setCategoryError(
+        err instanceof ApiError ? err.message : "Unexpected error",
+      );
+    } finally {
+      setCreatingCategory(false);
+    }
   }
 
   return (
@@ -78,6 +108,30 @@ export function TransactionForm({
           error={error}
           required
         />
+
+        {onCreateCategory && !addingCategory && (
+          <Button
+            variant="subtle"
+            size="xs"
+            type="button"
+            style={{ alignSelf: "flex-start" }}
+            onClick={() => {
+              setCategoryError(undefined);
+              setAddingCategory(true);
+            }}
+          >
+            + New category
+          </Button>
+        )}
+        {onCreateCategory && addingCategory && (
+          <InlineCategoryCreator
+            error={categoryError}
+            submitting={creatingCategory}
+            onCreate={handleCreateCategory}
+            onCancel={() => setAddingCategory(false)}
+          />
+        )}
+
         <Group justify="flex-end">
           <Button type="submit" loading={submitting}>
             Save
