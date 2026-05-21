@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+
+# Node modules persisted from the openspec Docker container
+dev/openspec/node_modules/
+
+# Environment / credentials — created manually, never committed
+.env
+
+# Editor / OS
+.DS_Store
