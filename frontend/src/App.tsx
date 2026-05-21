@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router";
 
 import { AppLayout } from "./components/AppLayout";
+import { BudgetDetailPage } from "./pages/BudgetDetailPage";
 import { BudgetsPage } from "./pages/BudgetsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -14,6 +15,7 @@ export function App() {
       <Route element={<AppLayout />}>
         <Route index element={<DashboardPage />} />
         <Route path="budgets" element={<BudgetsPage />} />
+        <Route path="budgets/:budgetId" element={<BudgetDetailPage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="*" element={<NotFoundPage />} />
