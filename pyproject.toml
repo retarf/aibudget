@@ -17,4 +17,9 @@ packages = ["aibudget_cli"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["backend/tests"]
+testpaths = [
+    "backend/services/budget/tests",
+    "backend/services/category/tests",
+    "backend/services/transaction/tests",
+    "backend/gateway/tests",
+]

@@ -1,29 +1,115 @@
 # aibudget stack — start with `./cli compose up`.
 # Environment values come from the manually-created .env file (see .env.template).
+#
+# The backend is split into an API gateway plus three domain services that
+# communicate over NATS; each service owns its own PostgreSQL database.
 services:
-  db:
+  nats:
+    image: nats:2-alpine
+    command: ["-js"]
+
+  # --- per-service databases (database-per-service) ------------------------
+  budget-db:
     image: postgres:17-alpine
     env_file: .env
+    environment:
+      POSTGRES_DB: budget
     volumes:
-      - db-data:/var/lib/postgresql/data
-    ports:
-      - "${POSTGRES_PORT}:5432"
+      - budget-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d budget"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-  backend:
+  category-db:
+    image: postgres:17-alpine
+    env_file: .env
+    environment:
+      POSTGRES_DB: category
+    volumes:
+      - category-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d category"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  transaction-db:
+    image: postgres:17-alpine
+    env_file: .env
+    environment:
+      POSTGRES_DB: transaction
+    volumes:
+      - transaction-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d transaction"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # --- domain services -----------------------------------------------------
+  budget-service:
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: backend/services/budget/Dockerfile
     env_file: .env
+    environment:
+      NATS_URL: nats://nats:4222
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@budget-db:5432/budget
+    depends_on:
+      nats:
+        condition: service_started
+      budget-db:
+        condition: service_healthy
+
+  category-service:
+    build:
+      context: .
+      dockerfile: backend/services/category/Dockerfile
+    env_file: .env
+    environment:
+      NATS_URL: nats://nats:4222
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@category-db:5432/category
+    depends_on:
+      nats:
+        condition: service_started
+      category-db:
+        condition: service_healthy
+
+  transaction-service:
+    build:
+      context: .
+      dockerfile: backend/services/transaction/Dockerfile
+    env_file: .env
+    environment:
+      NATS_URL: nats://nats:4222
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@transaction-db:5432/transaction
+    depends_on:
+      nats:
+        condition: service_started
+      transaction-db:
+        condition: service_healthy
+
+  # --- API gateway ---------------------------------------------------------
+  gateway:
+    build:
+      context: .
+      dockerfile: backend/gateway/Dockerfile
+    env_file: .env
+    environment:
+      NATS_URL: nats://nats:4222
     ports:
       - "${BACKEND_PORT}:8000"
     depends_on:
-      db:
-        condition: service_healthy
+      nats:
+        condition: service_started
+      budget-service:
+        condition: service_started
+      category-service:
+        condition: service_started
+      transaction-service:
+        condition: service_started
 
   frontend:
     build:
@@ -32,11 +118,13 @@ services:
     ports:
       - "${FRONTEND_PORT}:5173"
     depends_on:
-      - backend
+      - gateway
     volumes:
       # Bind-mount the source for hot reload; keep node_modules from the image.
       - ./frontend:/app
       - /app/node_modules
 
 volumes:
-  db-data:
+  budget-db-data:
+  category-db-data:
+  transaction-db-data:

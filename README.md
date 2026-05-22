@@ -5,10 +5,18 @@ them by category, and produce reports.
 
 ## Architecture
 
-- **UI** — React, Mantine (tested with jest + msw)
-- **REST API** — FastAPI
-- **Microservices** — nats-py
-- **Persistence** — SQLAlchemy
+The backend is split into an HTTP API gateway and three domain services that
+communicate over NATS; each service owns its own PostgreSQL database.
+
+- **UI** — React, Mantine (tested with jest + msw) — `frontend/`
+- **API gateway** — FastAPI; exposes the REST API, translating each request
+  into a NATS request/reply call — `backend/gateway/`
+- **Domain services** — `budget-service`, `category-service`,
+  `transaction-service`, each a nats-py process with its own database —
+  `backend/services/<domain>/`
+- **Messaging** — NATS: request/reply on the gateway↔service edge, domain
+  events between services — shared helpers in `backend/common/`
+- **Persistence** — PostgreSQL (SQLAlchemy), one database per service
 
 ## Development setup
 
@@ -106,8 +114,10 @@ automatically on first run.
 
 ### 5. The stack (Docker Compose)
 
-The frontend, backend, and PostgreSQL database all run as Docker Compose
-services. First, create the `.env` file manually from the template:
+The stack runs as Docker Compose services: the React frontend, the FastAPI
+API gateway, three domain services (`budget`, `category`, `transaction`), a
+NATS server, and one PostgreSQL database per service. First, create the `.env`
+file manually from the template:
 
 ```bash
 cp .env.template .env       # then edit .env and set real credentials
@@ -116,19 +126,20 @@ cp .env.template .env       # then edit .env and set real credentials
 Then manage the stack with the `cli compose` commands:
 
 ```bash
-cli compose up -d                 # start frontend + backend + db
-cli compose logs backend -f       # follow a service's logs
-cli compose rebuild frontend      # rebuild and recreate after code changes
+cli compose up -d                 # start the whole stack
+cli compose logs gateway -f       # follow a service's logs
+cli compose rebuild gateway       # rebuild and recreate after code changes
 cli compose down                  # stop the stack
 ```
 
 - Frontend (React + Mantine): `http://localhost:${FRONTEND_PORT}`
-- API: `http://localhost:${BACKEND_PORT}` — `/health` and docs at `/docs`
+- API gateway: `http://localhost:${BACKEND_PORT}` — `/health` and docs at `/docs`
 
-Run the test suites inside their containers:
+Run the test suites:
 
 ```bash
-cli backend test                  # pytest in the backend container
+cli test                          # all service + gateway suites, in containers
+cli test budget                   # one suite: budget|category|transaction|gateway
 cli frontend test                 # jest in the frontend container
 ```
 
@@ -138,7 +149,7 @@ cli frontend test                 # jest in the frontend container
 python --version            # Python 3.14.x
 cli --help                  # CLI help is shown
 docker run --rm hello-world # Docker works
-pytest                      # test suite runs (backend tests)
+pytest                      # service + gateway test suites run
 ```
 
 ## Notes

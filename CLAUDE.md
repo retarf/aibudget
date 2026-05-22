@@ -9,9 +9,21 @@ The home budget app. It contains:
 - reports
 
 ## Architecture
-- UI (React, Mantine, jest, msw)
-- REST API: FastAPI 
-- microservices: nats-py
+
+The backend is split into an HTTP API gateway and three domain services that
+communicate over NATS; each service owns its own PostgreSQL database.
+
+- **UI** — React, Mantine (tested with jest + msw); in `frontend/`.
+- **API gateway** — FastAPI; exposes the REST API and translates each request
+  into a NATS request/reply call. In `backend/gateway/`.
+- **Domain services** — `budget-service`, `category-service`,
+  `transaction-service`, each a `nats-py` process owning its own database; in
+  `backend/services/<domain>/`.
+- **Messaging** — NATS. Request/reply on the gateway↔service edge; domain
+  events (`<domain>.created/updated/deleted`) between services.
+  transaction-service maintains a local projection of budgets/categories from
+  those events and cascades deletes. Shared helpers in `backend/common/`.
+- **Persistence** — PostgreSQL, one database per service.
 
 ### Data model:
 budget (period of time where user can add expenses and incomes)

@@ -219,28 +219,42 @@ def _run_compose(project_root, *args):
         )
 
 
-@cli.group()
-def backend():
-    """Manage the backend service."""
+# Maps a test target to its (compose service, pytest path). Each suite uses
+# in-memory SQLite, so `--no-deps` skips starting databases and NATS.
+TEST_TARGETS = {
+    "budget": ("budget-service", "backend/services/budget/tests"),
+    "category": ("category-service", "backend/services/category/tests"),
+    "transaction": (
+        "transaction-service",
+        "backend/services/transaction/tests",
+    ),
+    "gateway": ("gateway", "backend/gateway/tests"),
+}
 
 
-@backend.command(context_settings={"ignore_unknown_options": True})
+@cli.command(context_settings={"ignore_unknown_options": True})
+@click.argument(
+    "target", type=click.Choice([*TEST_TARGETS, "all"]), default="all"
+)
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def test(ctx, args):
-    """Run the backend test suite inside the Docker Compose container.
+def test(ctx, target, args):
+    """Run service test suites inside their Docker Compose containers.
 
-    Runs pytest in a one-off `backend` container. Extra ARGS/flags are
-    forwarded to pytest, e.g. `cli backend test -k budgets`.
+    TARGET selects a suite — budget, category, transaction, gateway — or `all`
+    (the default). Extra ARGS/flags are forwarded to pytest, e.g.
+    `cli test budget -k create`.
     """
-    # `--no-deps` skips starting PostgreSQL — the tests use in-memory SQLite.
-    # `python -m pytest` puts the working directory on sys.path so `backend`
-    # is importable.
-    _run_compose(
-        ctx.obj["project_root"],
-        "run", "--rm", "--no-deps", "backend",
-        "python", "-m", "pytest", "backend/tests", *args,
+    selected = (
+        TEST_TARGETS if target == "all" else {target: TEST_TARGETS[target]}
     )
+    for name, (service, path) in selected.items():
+        click.echo(f"# {name} tests")
+        _run_compose(
+            ctx.obj["project_root"],
+            "run", "--rm", "--no-deps", service,
+            "python", "-m", "pytest", path, *args,
+        )
 
 
 @cli.group()
