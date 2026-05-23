@@ -2,6 +2,7 @@
 import type {
   Budget,
   BudgetInput,
+  BudgetSummary,
   Category,
   CategoryCreate,
   CategoryKind,
@@ -71,6 +72,8 @@ export const api = {
     }),
   deleteBudget: (id: number) =>
     request<void>(`/budgets/${id}`, { method: "DELETE" }),
+  getBudgetSummary: (id: number) =>
+    request<BudgetSummary>(`/budgets/${id}/summary`),
 
   // --- Transactions ---
   listTransactions: (budgetId: number) =>

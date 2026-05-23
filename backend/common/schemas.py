@@ -109,3 +109,20 @@ class TransactionRead(BaseModel):
     type: TransactionType
     amount: Decimal
     date: date
+
+
+# --- summary -----------------------------------------------------------------
+
+class BudgetSummaryTotals(BaseModel):
+    """Income, expense and net totals for a single budget."""
+
+    income: Decimal
+    expense: Decimal
+    net: Decimal
+
+
+class BudgetSummary(BaseModel):
+    """Aggregated summary of a budget's transactions."""
+
+    budget_id: int
+    totals: BudgetSummaryTotals

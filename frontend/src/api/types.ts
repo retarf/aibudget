@@ -42,3 +42,14 @@ export interface TransactionInput {
   date: string;
   category_id: number;
 }
+
+export interface BudgetSummaryTotals {
+  income: string;
+  expense: string;
+  net: string;
+}
+
+export interface BudgetSummary {
+  budget_id: number;
+  totals: BudgetSummaryTotals;
+}

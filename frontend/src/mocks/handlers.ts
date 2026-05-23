@@ -83,6 +83,29 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
+  http.get(`${API}/budgets/:id/summary`, ({ params }) => {
+    const id = Number(params.id);
+    const budget = store.budgets.find((b) => b.id === id);
+    if (!budget) {
+      return HttpResponse.json({ detail: "Budget not found" }, { status: 404 });
+    }
+    let income = 0;
+    let expense = 0;
+    for (const t of store.transactions) {
+      if (t.budget_id !== id) continue;
+      if (t.type === "income") income += Number(t.amount);
+      else expense += Number(t.amount);
+    }
+    return HttpResponse.json({
+      budget_id: id,
+      totals: {
+        income: income.toFixed(2),
+        expense: expense.toFixed(2),
+        net: (income - expense).toFixed(2),
+      },
+    });
+  }),
+
   // Transactions
   http.get(`${API}/budgets/:id/transactions`, ({ params }) =>
     HttpResponse.json(

@@ -8,22 +8,49 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { ApiError, api } from "../api/client";
-import type { Budget, BudgetInput } from "../api/types";
+import type { Budget, BudgetInput, BudgetSummary } from "../api/types";
 import { BudgetForm } from "../components/BudgetForm";
 import { useApiResource } from "../hooks/useApiResource";
 
 export function BudgetsPage() {
   const navigate = useNavigate();
   const budgets = useApiResource(() => api.listBudgets(), []);
+  const [summaries, setSummaries] = useState<Record<number, BudgetSummary>>({});
+  const [summariesError, setSummariesError] = useState<string>();
 
   const [editing, setEditing] = useState<Budget | "new" | null>(null);
   const [formError, setFormError] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<Budget | null>(null);
+
+  useEffect(() => {
+    if (!budgets.data) return;
+    let cancelled = false;
+    setSummariesError(undefined);
+    Promise.all(
+      budgets.data.map((b) =>
+        api.getBudgetSummary(b.id).then((s) => [b.id, s] as const),
+      ),
+    )
+      .then((entries) => {
+        if (cancelled) return;
+        setSummaries(Object.fromEntries(entries));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setSummariesError(
+          err instanceof ApiError ? err.message : "Unexpected error",
+        );
+        setSummaries({});
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [budgets.data]);
 
   async function handleSubmit(data: BudgetInput) {
     setSubmitting(true);
@@ -67,6 +94,7 @@ export function BudgetsPage() {
       </Group>
 
       {budgets.error && <Alert color="red">{budgets.error}</Alert>}
+      {summariesError && <Alert color="red">{summariesError}</Alert>}
       {!budgets.loading && budgets.data?.length === 0 && (
         <Text c="dimmed">No budgets yet. Create your first one.</Text>
       )}
@@ -78,6 +106,9 @@ export function BudgetsPage() {
               <Table.Th>Name</Table.Th>
               <Table.Th>Start date</Table.Th>
               <Table.Th>End date</Table.Th>
+              <Table.Th>Income</Table.Th>
+              <Table.Th>Expense</Table.Th>
+              <Table.Th>Net</Table.Th>
               <Table.Th />
             </Table.Tr>
           </Table.Thead>
@@ -87,6 +118,9 @@ export function BudgetsPage() {
                 <Table.Td>{budget.name}</Table.Td>
                 <Table.Td>{budget.start_date}</Table.Td>
                 <Table.Td>{budget.end_date}</Table.Td>
+                <Table.Td>{summaries[budget.id]?.totals.income ?? "—"}</Table.Td>
+                <Table.Td>{summaries[budget.id]?.totals.expense ?? "—"}</Table.Td>
+                <Table.Td>{summaries[budget.id]?.totals.net ?? "—"}</Table.Td>
                 <Table.Td>
                   <Group gap="xs" justify="flex-end">
                     <Button

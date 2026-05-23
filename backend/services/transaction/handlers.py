@@ -5,14 +5,25 @@ is ``_validate``: instead of reading the ``Budget`` and ``Category`` tables
 directly, it reads the local ``BudgetProjection`` / ``CategoryProjection``
 read-models fed by events (eventually consistent — see design.md).
 """
-from sqlalchemy import select
+from decimal import Decimal
+
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from backend.common.health import health_handler
 from backend.common.messaging import Outcome, ServiceError
-from backend.common.schemas import TransactionCreate, TransactionRead, TransactionUpdate
+from backend.common.schemas import (
+    BudgetSummary,
+    BudgetSummaryTotals,
+    TransactionCreate,
+    TransactionRead,
+    TransactionType,
+    TransactionUpdate,
+)
 
 from .models import BudgetProjection, CategoryProjection, Transaction
+
+_ZERO = Decimal("0.00")
 
 
 def _read(transaction: Transaction) -> dict:
@@ -104,6 +115,31 @@ def delete_transaction(db: Session, request: dict) -> Outcome:
     )
 
 
+def summarize_transactions(db: Session, request: dict) -> Outcome:
+    """Aggregate a budget's transactions into income / expense / net totals."""
+    budget_id = request["budget_id"]
+    _get_budget(db, budget_id)  # 404 if the budget is unknown
+    rows = db.execute(
+        select(Transaction.type, func.coalesce(func.sum(Transaction.amount), 0))
+        .where(Transaction.budget_id == budget_id)
+        .group_by(Transaction.type)
+    ).all()
+    totals = {TransactionType.income: _ZERO, TransactionType.expense: _ZERO}
+    for tx_type, total in rows:
+        totals[tx_type] = Decimal(total).quantize(_ZERO)
+    income = totals[TransactionType.income]
+    expense = totals[TransactionType.expense]
+    summary = BudgetSummary(
+        budget_id=budget_id,
+        totals=BudgetSummaryTotals(
+            income=income,
+            expense=expense,
+            net=(income - expense).quantize(_ZERO),
+        ),
+    )
+    return Outcome(reply=summary.model_dump(mode="json"))
+
+
 # Maps the operation name in a `transaction.<operation>` subject to its handler.
 HANDLERS = {
     "create": create_transaction,
@@ -111,5 +147,6 @@ HANDLERS = {
     "get": get_transaction,
     "update": update_transaction,
     "delete": delete_transaction,
+    "summary": summarize_transactions,
     "health": health_handler,
 }

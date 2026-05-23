@@ -108,3 +108,34 @@ def test_health_unhealthy_when_a_service_is_down(fake_request):
     with pytest.raises(HTTPException) as exc:
         asyncio.run(nats_client.health_check())
     assert exc.value.status_code == 503
+
+
+# --- summary route ----------------------------------------------------------
+
+SUMMARY = {
+    "budget_id": 1,
+    "totals": {"income": "120.00", "expense": "45.50", "net": "74.50"},
+}
+
+
+def test_summary_route_returns_totals(fake_request):
+    fake_request({"transaction.summary": {"ok": True, "data": SUMMARY}})
+    client = TestClient(app)
+    response = client.get("/budgets/1/summary")
+    assert response.status_code == 200
+    assert response.json() == SUMMARY
+
+
+def test_summary_route_surfaces_404_for_missing_budget(fake_request):
+    fake_request(
+        {
+            "transaction.summary": {
+                "ok": False,
+                "error": {"status": 404, "detail": "Budget not found"},
+            }
+        }
+    )
+    client = TestClient(app)
+    response = client.get("/budgets/999/summary")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Budget not found"

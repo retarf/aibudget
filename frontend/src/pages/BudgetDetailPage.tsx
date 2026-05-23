@@ -29,6 +29,7 @@ export function BudgetDetailPage() {
   const budget = useApiResource(() => api.getBudget(id), [id]);
   const transactions = useApiResource(() => api.listTransactions(id), [id]);
   const categories = useApiResource(() => api.listCategories(), []);
+  const summary = useApiResource(() => api.getBudgetSummary(id), [id]);
 
   const [editing, setEditing] = useState<Transaction | "new" | null>(null);
   const [formError, setFormError] = useState<string>();
@@ -42,6 +43,11 @@ export function BudgetDetailPage() {
     );
   }
 
+  function reloadAfterWrite() {
+    transactions.reload();
+    summary.reload();
+  }
+
   async function handleSubmit(data: TransactionInput) {
     setSubmitting(true);
     setFormError(undefined);
@@ -52,7 +58,7 @@ export function BudgetDetailPage() {
         await api.updateTransaction(editing.id, data);
       }
       setEditing(null);
-      transactions.reload();
+      reloadAfterWrite();
     } catch (err) {
       setFormError(err instanceof ApiError ? err.message : "Unexpected error");
     } finally {
@@ -66,7 +72,7 @@ export function BudgetDetailPage() {
     }
     await api.deleteTransaction(deleting.id);
     setDeleting(null);
-    transactions.reload();
+    reloadAfterWrite();
   }
 
   async function handleCreateCategory(data: CategoryCreate): Promise<Category> {
@@ -100,8 +106,27 @@ export function BudgetDetailPage() {
         </Text>
       )}
 
-      {(budget.error || transactions.error) && (
-        <Alert color="red">{budget.error ?? transactions.error}</Alert>
+      {summary.data && (
+        <Group gap="xl">
+          <Stack gap={2}>
+            <Text size="sm" c="dimmed">Income</Text>
+            <Text fw={500}>{summary.data.totals.income}</Text>
+          </Stack>
+          <Stack gap={2}>
+            <Text size="sm" c="dimmed">Expense</Text>
+            <Text fw={500}>{summary.data.totals.expense}</Text>
+          </Stack>
+          <Stack gap={2}>
+            <Text size="sm" c="dimmed">Net</Text>
+            <Text fw={500}>{summary.data.totals.net}</Text>
+          </Stack>
+        </Group>
+      )}
+
+      {(budget.error || transactions.error || summary.error) && (
+        <Alert color="red">
+          {budget.error ?? transactions.error ?? summary.error}
+        </Alert>
       )}
       {!transactions.loading && transactions.data?.length === 0 && (
         <Text c="dimmed">No transactions yet.</Text>

@@ -5,7 +5,12 @@ for retrieve/update/delete.
 """
 from fastapi import APIRouter, status
 
-from backend.common.schemas import TransactionCreate, TransactionRead, TransactionUpdate
+from backend.common.schemas import (
+    BudgetSummary,
+    TransactionCreate,
+    TransactionRead,
+    TransactionUpdate,
+)
 
 from ..nats_client import call
 
@@ -29,6 +34,11 @@ async def create_transaction(budget_id: int, data: TransactionCreate):
 )
 async def list_transactions(budget_id: int):
     return await call("transaction.list", {"budget_id": budget_id})
+
+
+@router.get("/budgets/{budget_id}/summary", response_model=BudgetSummary)
+async def summarize_budget(budget_id: int):
+    return await call("transaction.summary", {"budget_id": budget_id})
 
 
 @router.get("/transactions/{transaction_id}", response_model=TransactionRead)

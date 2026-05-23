@@ -1,8 +1,10 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { Route, Routes } from "react-router";
 
 import { seedBudget, seedCategory, seedTransaction } from "../mocks/handlers";
+import { server } from "../mocks/server";
 import { BudgetDetailPage } from "../pages/BudgetDetailPage";
 import { renderWithProviders } from "../test-utils";
 
@@ -31,8 +33,9 @@ describe("transaction pages", () => {
       date: "2026-05-10",
     });
     renderDetail(budget.id);
-    expect(await screen.findByText("12.50")).toBeInTheDocument();
-    expect(screen.getByText("Food")).toBeInTheDocument();
+    const table = await screen.findByRole("table");
+    expect(within(table).getByText("12.50")).toBeInTheDocument();
+    expect(within(table).getByText("Food")).toBeInTheDocument();
   });
 
   test("shows an empty state when a budget has no transactions", async () => {
@@ -60,14 +63,142 @@ describe("transaction pages", () => {
       date: "2026-05-10",
     });
     renderDetail(budget.id);
-    await screen.findByText("12.50");
+    const table = await screen.findByRole("table");
+    expect(within(table).getByText("12.50")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     const dialog = await screen.findByRole("dialog");
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Delete" }),
     );
     await waitFor(() =>
-      expect(screen.queryByText("12.50")).not.toBeInTheDocument(),
+      expect(within(table).queryByText("12.50")).not.toBeInTheDocument(),
     );
+  });
+});
+
+// --- totals block -----------------------------------------------------------
+
+function getTotal(label: "Income" | "Expense" | "Net"): string {
+  const stack = screen.getByText(label).parentElement!;
+  return within(stack).getByText(/^-?\d/).textContent!;
+}
+
+async function findTotal(label: "Income" | "Expense" | "Net"): Promise<string> {
+  const labelEl = await screen.findByText(label);
+  const stack = labelEl.parentElement!;
+  return (await within(stack).findByText(/^-?\d/)).textContent!;
+}
+
+describe("budget detail totals", () => {
+  test("shows income, expense and net totals", async () => {
+    const budget = seedBudget({
+      name: "May",
+      start_date: "2026-05-01",
+      end_date: "2026-05-31",
+    });
+    const expenseCat = seedCategory({ name: "Food", kind: "expense" });
+    const incomeCat = seedCategory({ name: "Salary", kind: "income" });
+    seedTransaction({
+      budget_id: budget.id,
+      category_id: incomeCat.id,
+      type: "income",
+      amount: "120.00",
+      date: "2026-05-05",
+    });
+    seedTransaction({
+      budget_id: budget.id,
+      category_id: expenseCat.id,
+      type: "expense",
+      amount: "45.50",
+      date: "2026-05-10",
+    });
+    renderDetail(budget.id);
+    expect(await findTotal("Income")).toBe("120.00");
+    expect(getTotal("Expense")).toBe("45.50");
+    expect(getTotal("Net")).toBe("74.50");
+  });
+
+  test("shows zero totals for a budget with no transactions", async () => {
+    const budget = seedBudget({
+      name: "May",
+      start_date: "2026-05-01",
+      end_date: "2026-05-31",
+    });
+    renderDetail(budget.id);
+    expect(await findTotal("Income")).toBe("0.00");
+    expect(getTotal("Expense")).toBe("0.00");
+    expect(getTotal("Net")).toBe("0.00");
+  });
+
+  test("totals refresh after recording a transaction", async () => {
+    const budget = seedBudget({
+      name: "May",
+      start_date: "2026-05-01",
+      end_date: "2026-05-31",
+    });
+    seedCategory({ name: "Food", kind: "expense" });
+    renderDetail(budget.id);
+    expect(await findTotal("Expense")).toBe("0.00");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /record transaction/i }),
+    );
+    fireEvent.change(await screen.findByLabelText(/Amount/), {
+      target: { value: "30.00" },
+    });
+    fireEvent.change(screen.getByLabelText(/Date/), {
+      target: { value: "2026-05-10" },
+    });
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(getTotal("Expense")).toBe("30.00"));
+    expect(getTotal("Net")).toBe("-30.00");
+  });
+
+  test("totals refresh after deleting a transaction", async () => {
+    const budget = seedBudget({
+      name: "May",
+      start_date: "2026-05-01",
+      end_date: "2026-05-31",
+    });
+    const category = seedCategory({ name: "Food", kind: "expense" });
+    seedTransaction({
+      budget_id: budget.id,
+      category_id: category.id,
+      type: "expense",
+      amount: "30.00",
+      date: "2026-05-10",
+    });
+    renderDetail(budget.id);
+    expect(await findTotal("Expense")).toBe("30.00");
+
+    await userEvent.click(screen.getByRole("button", { name: "Delete" }));
+    const dialog = await screen.findByRole("dialog");
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Delete" }),
+    );
+
+    await waitFor(() => expect(getTotal("Expense")).toBe("0.00"));
+    expect(getTotal("Net")).toBe("0.00");
+  });
+
+  test("surfaces a summary load error and renders no totals", async () => {
+    const budget = seedBudget({
+      name: "May",
+      start_date: "2026-05-01",
+      end_date: "2026-05-31",
+    });
+    server.use(
+      http.get(
+        `http://localhost:8000/budgets/${budget.id}/summary`,
+        () =>
+          HttpResponse.json({ detail: "Summary blew up" }, { status: 500 }),
+      ),
+    );
+    renderDetail(budget.id);
+    expect(await screen.findByText("Summary blew up")).toBeInTheDocument();
+    expect(screen.queryByText("Income")).not.toBeInTheDocument();
+    expect(screen.queryByText("Expense")).not.toBeInTheDocument();
+    expect(screen.queryByText("Net")).not.toBeInTheDocument();
   });
 });
