@@ -5,6 +5,7 @@ import { http, HttpResponse } from "msw";
 import {
   seedBudget,
   seedCategory,
+  seedTemplate,
   seedTransaction,
 } from "../mocks/handlers";
 import { server } from "../mocks/server";
@@ -67,6 +68,27 @@ describe("budget pages", () => {
     ).toBeInTheDocument();
   });
 
+  test("shows the template selector in the new-budget form when templates exist", async () => {
+    const food = seedCategory({ name: "Food", kind: "expense" });
+    seedTemplate("Monthly", [
+      { category_id: food.id, planned_amount: "200.00" },
+    ]);
+    renderWithProviders(<BudgetsPage />);
+    await userEvent.click(screen.getByRole("button", { name: /new budget/i }));
+    expect(
+      await screen.findByLabelText(/start from a template/i),
+    ).toBeInTheDocument();
+  });
+
+  test("hides the template selector when no templates exist", async () => {
+    renderWithProviders(<BudgetsPage />);
+    await userEvent.click(screen.getByRole("button", { name: /new budget/i }));
+    await screen.findByLabelText(/Name/);
+    expect(
+      screen.queryByLabelText(/start from a template/i),
+    ).not.toBeInTheDocument();
+  });
+
   test("deletes a budget", async () => {
     seedBudget({
       name: "Old",
@@ -87,7 +109,7 @@ describe("budget pages", () => {
 });
 
 describe("budget list totals", () => {
-  test("shows per-row income, expense and net for each budget", async () => {
+  test("shows per-row actual income, actual expense and net for each budget", async () => {
     const may = seedBudget({
       name: "May",
       start_date: "2026-05-01",
@@ -132,7 +154,11 @@ describe("budget list totals", () => {
     });
 
     const juneRow = getRow("June");
-    expect(within(juneRow).getByText("0.00")).toBeInTheDocument();
+    // June has only an expense transaction: planned_income, actual_income,
+    // planned_expense are all 0, actual_expense is 10.00, net is -10.00.
+    expect(within(juneRow).getAllByText("0.00").length).toBeGreaterThanOrEqual(
+      3,
+    );
     expect(within(juneRow).getByText("10.00")).toBeInTheDocument();
     expect(within(juneRow).getByText("-10.00")).toBeInTheDocument();
   });
@@ -146,7 +172,7 @@ describe("budget list totals", () => {
     renderWithProviders(<BudgetsPage />);
     const row = await findRow("May");
     await waitFor(() => {
-      expect(within(row).getAllByText("0.00")).toHaveLength(3);
+      expect(within(row).getAllByText("0.00")).toHaveLength(5);
     });
   });
 
@@ -164,7 +190,7 @@ describe("budget list totals", () => {
 
     const row = await findRow("June");
     await waitFor(() => {
-      expect(within(row).getAllByText("0.00")).toHaveLength(3);
+      expect(within(row).getAllByText("0.00")).toHaveLength(5);
     });
   });
 
@@ -223,6 +249,6 @@ describe("budget list totals", () => {
     renderWithProviders(<BudgetsPage />);
     expect(await screen.findByText("Summary blew up")).toBeInTheDocument();
     const row = getRow("May");
-    expect(within(row).getAllByText("—")).toHaveLength(3);
+    expect(within(row).getAllByText("—")).toHaveLength(5);
   });
 });

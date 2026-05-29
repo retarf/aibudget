@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .nats_client import close_nats, connect_nats, health_check
-from .routers import budgets, categories, transactions
+from .routers import allocations, budgets, categories, templates, transactions
 
 
 @asynccontextmanager
@@ -35,6 +35,9 @@ app.add_middleware(
 app.include_router(categories.router)
 app.include_router(budgets.router)
 app.include_router(transactions.router)
+app.include_router(templates.router)
+app.include_router(templates.apply_router)
+app.include_router(allocations.router)
 
 
 @app.get("/health", tags=["health"])

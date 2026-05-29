@@ -44,12 +44,66 @@ export interface TransactionInput {
 }
 
 export interface BudgetSummaryTotals {
-  income: string;
-  expense: string;
+  planned_income: string;
+  actual_income: string;
+  planned_expense: string;
+  actual_expense: string;
   net: string;
+}
+
+export interface BudgetSummaryCategory {
+  category_id: number;
+  kind: CategoryKind;
+  planned_amount: string;
+  actual_amount: string;
 }
 
 export interface BudgetSummary {
   budget_id: number;
   totals: BudgetSummaryTotals;
+  categories: BudgetSummaryCategory[];
+}
+
+export interface TemplateItem {
+  id: number;
+  category_id: number;
+  planned_amount: string;
+}
+
+export interface Template {
+  id: number;
+  name: string;
+}
+
+export interface TemplateDetail extends Template {
+  items: TemplateItem[];
+}
+
+export interface TemplateCreate {
+  name: string;
+}
+
+export interface TemplateItemCreate {
+  category_id: number;
+  planned_amount: string;
+}
+
+export interface ApplyTemplate {
+  template_id: number;
+}
+
+export interface Allocation {
+  id: number;
+  budget_id: number;
+  category_id: number;
+  planned_amount: string;
+}
+
+export interface AllocationCreate {
+  category_id: number;
+  planned_amount: string;
+}
+
+export interface AllocationUpdate {
+  planned_amount: string;
 }

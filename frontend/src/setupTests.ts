@@ -23,6 +23,12 @@ class ResizeObserverMock {
 
 window.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
 
+// jsdom doesn't implement scrollIntoView; Mantine Combobox uses it when
+// opening the listbox.
+if (typeof Element.prototype.scrollIntoView !== "function") {
+  Element.prototype.scrollIntoView = function () {};
+}
+
 beforeEach(() => {
   Object.defineProperty(window, "matchMedia", {
     writable: true,

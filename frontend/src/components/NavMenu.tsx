@@ -6,6 +6,7 @@ const SECTIONS = [
   { label: "Dashboard", to: "/" },
   { label: "Budgets", to: "/budgets" },
   { label: "Categories", to: "/categories" },
+  { label: "Templates", to: "/templates" },
   { label: "Reports", to: "/reports" },
 ];
 

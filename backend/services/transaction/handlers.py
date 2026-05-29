@@ -13,8 +13,7 @@ from sqlalchemy.orm import Session
 from backend.common.health import health_handler
 from backend.common.messaging import Outcome, ServiceError
 from backend.common.schemas import (
-    BudgetSummary,
-    BudgetSummaryTotals,
+    CategorySummary,
     TransactionCreate,
     TransactionRead,
     TransactionType,
@@ -115,29 +114,44 @@ def delete_transaction(db: Session, request: dict) -> Outcome:
     )
 
 
-def summarize_transactions(db: Session, request: dict) -> Outcome:
-    """Aggregate a budget's transactions into income / expense / net totals."""
+def summarize_by_category(db: Session, request: dict) -> Outcome:
+    """Per-category actual income/expense sums for the gateway summary.
+
+    Returns one row per ``(category_id, kind)`` pair appearing in the budget's
+    transactions. ``kind`` matches the transaction type, since a single
+    category may legitimately appear under both kinds in this domain.
+    """
     budget_id = request["budget_id"]
     _get_budget(db, budget_id)  # 404 if the budget is unknown
+
     rows = db.execute(
-        select(Transaction.type, func.coalesce(func.sum(Transaction.amount), 0))
+        select(
+            Transaction.category_id,
+            Transaction.type,
+            func.coalesce(func.sum(Transaction.amount), 0),
+        )
         .where(Transaction.budget_id == budget_id)
-        .group_by(Transaction.type)
+        .group_by(Transaction.category_id, Transaction.type)
     ).all()
-    totals = {TransactionType.income: _ZERO, TransactionType.expense: _ZERO}
-    for tx_type, total in rows:
-        totals[tx_type] = Decimal(total).quantize(_ZERO)
-    income = totals[TransactionType.income]
-    expense = totals[TransactionType.expense]
-    summary = BudgetSummary(
-        budget_id=budget_id,
-        totals=BudgetSummaryTotals(
-            income=income,
-            expense=expense,
-            net=(income - expense).quantize(_ZERO),
-        ),
-    )
-    return Outcome(reply=summary.model_dump(mode="json"))
+
+    summary: dict[tuple[int, TransactionType], dict[str, Decimal]] = {}
+    for category_id, tx_type, total in rows:
+        key = (category_id, tx_type)
+        bucket = summary.setdefault(
+            key, {"income": _ZERO, "expense": _ZERO}
+        )
+        bucket[tx_type.value] = Decimal(total).quantize(_ZERO)
+
+    reply = [
+        CategorySummary(
+            category_id=category_id,
+            kind=tx_type.value,
+            income=bucket["income"],
+            expense=bucket["expense"],
+        ).model_dump(mode="json")
+        for (category_id, tx_type), bucket in summary.items()
+    ]
+    return Outcome(reply=reply)
 
 
 # Maps the operation name in a `transaction.<operation>` subject to its handler.
@@ -147,6 +161,6 @@ HANDLERS = {
     "get": get_transaction,
     "update": update_transaction,
     "delete": delete_transaction,
-    "summary": summarize_transactions,
+    "summary.categories": summarize_by_category,
     "health": health_handler,
 }

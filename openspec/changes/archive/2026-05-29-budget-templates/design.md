@@ -27,6 +27,8 @@ health checks; this change adds a second aggregation point for the summary.
 - Enhanced `GET /budgets/{budget_id}/summary`: planned vs actual at both
   aggregate and per-category level.
 - Template selector in the budget creation form and budget detail page.
+- A dedicated frontend page (`/templates`) for creating, browsing, and
+  managing templates and their line items.
 
 **Non-Goals:**
 - Live link between a template and its derived budgets (template edits never
@@ -150,7 +152,22 @@ Follows the existing `<domain>.<noun>.<operation>` pattern:
 | `budget.allocation.delete` | budget-service | request/reply |
 | `transaction.summary.categories` | transaction-service | request/reply |
 
-### Decision 9 — REST routes
+### Decision 9 — Templates have their own frontend page
+
+Templates are a first-class entity managed independently of any concrete
+budget, so they get their own top-level page (`/templates`) reached from the
+main navigation — mirroring the existing `Budgets` and `Categories` pages.
+The page handles template CRUD and line-item management. The budget creation
+form's template Select and the budget detail's "Apply template" modal are
+additional entry points that consume the same templates but don't replace the
+need for a dedicated management surface.
+
+Trade-off: a separate page is more navigation surface than embedding template
+management inside the budget detail. We accept that because templates outlive
+budgets and a single template is intentionally applied to many budgets — the
+management UI shouldn't live inside any one budget.
+
+### Decision 10 — REST routes
 
 | Method | Path | Description |
 |---|---|---|

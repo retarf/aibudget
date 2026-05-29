@@ -111,18 +111,121 @@ class TransactionRead(BaseModel):
     date: date
 
 
+# --- templates ---------------------------------------------------------------
+
+class TemplateCreate(BaseModel):
+    """Request body for creating a budget template."""
+
+    name: str = Field(min_length=1, max_length=100)
+
+
+class TemplateUpdate(BaseModel):
+    """Request body for updating a template's name."""
+
+    name: str = Field(min_length=1, max_length=100)
+
+
+class TemplateItemCreate(BaseModel):
+    """Request body for adding a line item to a template."""
+
+    category_id: int
+    planned_amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
+
+
+class TemplateItemRead(BaseModel):
+    """A single template line item as returned by the API."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    category_id: int
+    planned_amount: Decimal
+
+
+class TemplateRead(BaseModel):
+    """A template summary (without line items) as returned by the API."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+
+
+class TemplateDetailRead(BaseModel):
+    """A template with its full list of line items."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    items: list[TemplateItemRead]
+
+
+class ApplyTemplateRequest(BaseModel):
+    """Request body for applying a template to a budget."""
+
+    template_id: int
+
+
+# --- allocations -------------------------------------------------------------
+
+class AllocationCreate(BaseModel):
+    """Request body for creating a planned allocation on a budget."""
+
+    category_id: int
+    planned_amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
+
+
+class AllocationUpdate(BaseModel):
+    """Request body for updating the planned amount on an allocation."""
+
+    planned_amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
+
+
+class AllocationRead(BaseModel):
+    """A planned allocation as returned by the API."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    budget_id: int
+    category_id: int
+    planned_amount: Decimal
+
+
 # --- summary -----------------------------------------------------------------
 
 class BudgetSummaryTotals(BaseModel):
-    """Income, expense and net totals for a single budget."""
+    """Planned vs actual income/expense totals for a single budget."""
 
-    income: Decimal
-    expense: Decimal
+    planned_income: Decimal
+    actual_income: Decimal
+    planned_expense: Decimal
+    actual_expense: Decimal
     net: Decimal
 
 
+class BudgetSummaryCategory(BaseModel):
+    """Planned vs actual amounts for a single category within a budget."""
+
+    category_id: int
+    kind: CategoryKind
+    planned_amount: Decimal
+    actual_amount: Decimal
+
+
 class BudgetSummary(BaseModel):
-    """Aggregated summary of a budget's transactions."""
+    """Planned vs actual summary of a budget at aggregate and category level."""
 
     budget_id: int
     totals: BudgetSummaryTotals
+    categories: list[BudgetSummaryCategory]
+
+
+class CategorySummary(BaseModel):
+    """A single (category, kind) actual-sum row from transaction-service."""
+
+    category_id: int
+    kind: CategoryKind
+    income: Decimal
+    expense: Decimal

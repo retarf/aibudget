@@ -19,6 +19,7 @@ import type {
   Transaction,
   TransactionInput,
 } from "../api/types";
+import { AllocationPanel } from "../components/AllocationPanel";
 import { TransactionForm } from "../components/TransactionForm";
 import { useApiResource } from "../hooks/useApiResource";
 
@@ -107,21 +108,60 @@ export function BudgetDetailPage() {
       )}
 
       {summary.data && (
-        <Group gap="xl">
-          <Stack gap={2}>
-            <Text size="sm" c="dimmed">Income</Text>
-            <Text fw={500}>{summary.data.totals.income}</Text>
-          </Stack>
-          <Stack gap={2}>
-            <Text size="sm" c="dimmed">Expense</Text>
-            <Text fw={500}>{summary.data.totals.expense}</Text>
-          </Stack>
-          <Stack gap={2}>
-            <Text size="sm" c="dimmed">Net</Text>
-            <Text fw={500}>{summary.data.totals.net}</Text>
-          </Stack>
-        </Group>
+        <Stack gap="md">
+          <Group gap="xl">
+            <Stack gap={2}>
+              <Text size="sm" c="dimmed">Planned income</Text>
+              <Text fw={500}>{summary.data.totals.planned_income}</Text>
+            </Stack>
+            <Stack gap={2}>
+              <Text size="sm" c="dimmed">Actual income</Text>
+              <Text fw={500}>{summary.data.totals.actual_income}</Text>
+            </Stack>
+            <Stack gap={2}>
+              <Text size="sm" c="dimmed">Planned expense</Text>
+              <Text fw={500}>{summary.data.totals.planned_expense}</Text>
+            </Stack>
+            <Stack gap={2}>
+              <Text size="sm" c="dimmed">Actual expense</Text>
+              <Text fw={500}>{summary.data.totals.actual_expense}</Text>
+            </Stack>
+            <Stack gap={2}>
+              <Text size="sm" c="dimmed">Net</Text>
+              <Text fw={500}>{summary.data.totals.net}</Text>
+            </Stack>
+          </Group>
+
+          {summary.data.categories.length > 0 && (
+            <Table aria-label="Planned vs actual by category">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Category</Table.Th>
+                  <Table.Th>Kind</Table.Th>
+                  <Table.Th>Planned</Table.Th>
+                  <Table.Th>Actual</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {summary.data.categories.map((row) => (
+                  <Table.Tr key={`${row.category_id}-${row.kind}`}>
+                    <Table.Td>{categoryName(row.category_id)}</Table.Td>
+                    <Table.Td>{row.kind}</Table.Td>
+                    <Table.Td>{row.planned_amount}</Table.Td>
+                    <Table.Td>{row.actual_amount}</Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          )}
+        </Stack>
       )}
+
+      <AllocationPanel
+        budgetId={id}
+        categories={categories.data ?? []}
+        onChange={summary.reload}
+      />
 
       {(budget.error || transactions.error || summary.error) && (
         <Alert color="red">

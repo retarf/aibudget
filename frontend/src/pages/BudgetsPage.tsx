@@ -52,12 +52,15 @@ export function BudgetsPage() {
     };
   }, [budgets.data]);
 
-  async function handleSubmit(data: BudgetInput) {
+  async function handleSubmit(data: BudgetInput, templateId?: number) {
     setSubmitting(true);
     setFormError(undefined);
     try {
       if (editing === "new") {
-        await api.createBudget(data);
+        const created = await api.createBudget(data);
+        if (templateId !== undefined) {
+          await api.applyTemplate(created.id, templateId);
+        }
       } else if (editing) {
         await api.updateBudget(editing.id, data);
       }
@@ -106,8 +109,10 @@ export function BudgetsPage() {
               <Table.Th>Name</Table.Th>
               <Table.Th>Start date</Table.Th>
               <Table.Th>End date</Table.Th>
-              <Table.Th>Income</Table.Th>
-              <Table.Th>Expense</Table.Th>
+              <Table.Th>Planned income</Table.Th>
+              <Table.Th>Actual income</Table.Th>
+              <Table.Th>Planned expense</Table.Th>
+              <Table.Th>Actual expense</Table.Th>
               <Table.Th>Net</Table.Th>
               <Table.Th />
             </Table.Tr>
@@ -118,8 +123,18 @@ export function BudgetsPage() {
                 <Table.Td>{budget.name}</Table.Td>
                 <Table.Td>{budget.start_date}</Table.Td>
                 <Table.Td>{budget.end_date}</Table.Td>
-                <Table.Td>{summaries[budget.id]?.totals.income ?? "—"}</Table.Td>
-                <Table.Td>{summaries[budget.id]?.totals.expense ?? "—"}</Table.Td>
+                <Table.Td>
+                  {summaries[budget.id]?.totals.planned_income ?? "—"}
+                </Table.Td>
+                <Table.Td>
+                  {summaries[budget.id]?.totals.actual_income ?? "—"}
+                </Table.Td>
+                <Table.Td>
+                  {summaries[budget.id]?.totals.planned_expense ?? "—"}
+                </Table.Td>
+                <Table.Td>
+                  {summaries[budget.id]?.totals.actual_expense ?? "—"}
+                </Table.Td>
                 <Table.Td>{summaries[budget.id]?.totals.net ?? "—"}</Table.Td>
                 <Table.Td>
                   <Group gap="xs" justify="flex-end">

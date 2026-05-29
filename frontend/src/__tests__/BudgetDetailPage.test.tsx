@@ -33,7 +33,7 @@ describe("transaction pages", () => {
       date: "2026-05-10",
     });
     renderDetail(budget.id);
-    const table = await screen.findByRole("table");
+    const table = await getTransactionsTable();
     expect(within(table).getByText("12.50")).toBeInTheDocument();
     expect(within(table).getByText("Food")).toBeInTheDocument();
   });
@@ -63,9 +63,11 @@ describe("transaction pages", () => {
       date: "2026-05-10",
     });
     renderDetail(budget.id);
-    const table = await screen.findByRole("table");
+    const table = await getTransactionsTable();
     expect(within(table).getByText("12.50")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Delete" }));
+    await userEvent.click(
+      within(table).getByRole("button", { name: "Delete" }),
+    );
     const dialog = await screen.findByRole("dialog");
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Delete" }),
@@ -76,21 +78,35 @@ describe("transaction pages", () => {
   });
 });
 
+async function getTransactionsTable(): Promise<HTMLElement> {
+  const tables = await screen.findAllByRole("table");
+  const match = tables.find((t) => within(t).queryByText(/^Date$/));
+  if (!match) throw new Error("transactions table not found");
+  return match;
+}
+
 // --- totals block -----------------------------------------------------------
 
-function getTotal(label: "Income" | "Expense" | "Net"): string {
+type TotalLabel =
+  | "Planned income"
+  | "Actual income"
+  | "Planned expense"
+  | "Actual expense"
+  | "Net";
+
+function getTotal(label: TotalLabel): string {
   const stack = screen.getByText(label).parentElement!;
   return within(stack).getByText(/^-?\d/).textContent!;
 }
 
-async function findTotal(label: "Income" | "Expense" | "Net"): Promise<string> {
+async function findTotal(label: TotalLabel): Promise<string> {
   const labelEl = await screen.findByText(label);
   const stack = labelEl.parentElement!;
   return (await within(stack).findByText(/^-?\d/)).textContent!;
 }
 
 describe("budget detail totals", () => {
-  test("shows income, expense and net totals", async () => {
+  test("shows planned and actual totals", async () => {
     const budget = seedBudget({
       name: "May",
       start_date: "2026-05-01",
@@ -113,8 +129,8 @@ describe("budget detail totals", () => {
       date: "2026-05-10",
     });
     renderDetail(budget.id);
-    expect(await findTotal("Income")).toBe("120.00");
-    expect(getTotal("Expense")).toBe("45.50");
+    expect(await findTotal("Actual income")).toBe("120.00");
+    expect(getTotal("Actual expense")).toBe("45.50");
     expect(getTotal("Net")).toBe("74.50");
   });
 
@@ -125,8 +141,8 @@ describe("budget detail totals", () => {
       end_date: "2026-05-31",
     });
     renderDetail(budget.id);
-    expect(await findTotal("Income")).toBe("0.00");
-    expect(getTotal("Expense")).toBe("0.00");
+    expect(await findTotal("Actual income")).toBe("0.00");
+    expect(getTotal("Actual expense")).toBe("0.00");
     expect(getTotal("Net")).toBe("0.00");
   });
 
@@ -138,7 +154,7 @@ describe("budget detail totals", () => {
     });
     seedCategory({ name: "Food", kind: "expense" });
     renderDetail(budget.id);
-    expect(await findTotal("Expense")).toBe("0.00");
+    expect(await findTotal("Actual expense")).toBe("0.00");
 
     await userEvent.click(
       screen.getByRole("button", { name: /record transaction/i }),
@@ -151,7 +167,7 @@ describe("budget detail totals", () => {
     });
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
 
-    await waitFor(() => expect(getTotal("Expense")).toBe("30.00"));
+    await waitFor(() => expect(getTotal("Actual expense")).toBe("30.00"));
     expect(getTotal("Net")).toBe("-30.00");
   });
 
@@ -170,15 +186,18 @@ describe("budget detail totals", () => {
       date: "2026-05-10",
     });
     renderDetail(budget.id);
-    expect(await findTotal("Expense")).toBe("30.00");
+    expect(await findTotal("Actual expense")).toBe("30.00");
 
-    await userEvent.click(screen.getByRole("button", { name: "Delete" }));
+    const transactionsTable = await getTransactionsTable();
+    await userEvent.click(
+      within(transactionsTable).getByRole("button", { name: "Delete" }),
+    );
     const dialog = await screen.findByRole("dialog");
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Delete" }),
     );
 
-    await waitFor(() => expect(getTotal("Expense")).toBe("0.00"));
+    await waitFor(() => expect(getTotal("Actual expense")).toBe("0.00"));
     expect(getTotal("Net")).toBe("0.00");
   });
 
@@ -197,8 +216,8 @@ describe("budget detail totals", () => {
     );
     renderDetail(budget.id);
     expect(await screen.findByText("Summary blew up")).toBeInTheDocument();
-    expect(screen.queryByText("Income")).not.toBeInTheDocument();
-    expect(screen.queryByText("Expense")).not.toBeInTheDocument();
+    expect(screen.queryByText("Actual income")).not.toBeInTheDocument();
+    expect(screen.queryByText("Actual expense")).not.toBeInTheDocument();
     expect(screen.queryByText("Net")).not.toBeInTheDocument();
   });
 });

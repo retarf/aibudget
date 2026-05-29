@@ -168,42 +168,38 @@ def _seed_income_category(db, category_id=2):
     db.commit()
 
 
-def test_summary_for_unknown_budget_raises_404(db):
+def test_summary_categories_for_unknown_budget_raises_404(db):
     with pytest.raises(ServiceError) as exc:
-        handlers.summarize_transactions(db, {"budget_id": 999})
+        handlers.summarize_by_category(db, {"budget_id": 999})
     assert exc.value.status == 404
 
 
-def test_summary_for_budget_without_transactions_returns_zeros(db):
+def test_summary_categories_for_budget_without_transactions_returns_empty(db):
     _seed_budget(db)
-    outcome = handlers.summarize_transactions(db, {"budget_id": 1})
-    assert outcome.reply == {
-        "budget_id": 1,
-        "totals": {"income": "0.00", "expense": "0.00", "net": "0.00"},
-    }
+    outcome = handlers.summarize_by_category(db, {"budget_id": 1})
+    assert outcome.reply == []
     assert outcome.event_change is None
 
 
-def test_summary_aggregates_income_and_expense(db):
+def test_summary_categories_groups_by_category_and_kind(db):
     _seed_budget(db)
     _seed_category(db)
     _seed_income_category(db)
     _create(db, type="expense", amount="45.50", category_id=1)
     _create(db, type="expense", amount="4.50", category_id=1)
     _create(db, type="income", amount="120.00", category_id=2)
-    outcome = handlers.summarize_transactions(db, {"budget_id": 1})
-    assert outcome.reply["totals"] == {
-        "income": "120.00",
-        "expense": "50.00",
-        "net": "70.00",
-    }
+    outcome = handlers.summarize_by_category(db, {"budget_id": 1})
+    by_key = {(row["category_id"], row["kind"]): row for row in outcome.reply}
+    assert by_key[(1, "expense")]["expense"] == "50.00"
+    assert by_key[(1, "expense")]["income"] == "0.00"
+    assert by_key[(2, "income")]["income"] == "120.00"
+    assert by_key[(2, "income")]["expense"] == "0.00"
 
 
-def test_summary_decimal_precision_preserves_two_places(db):
+def test_summary_categories_decimal_precision(db):
     _seed_budget(db)
     _seed_category(db)
     _create(db, type="expense", amount="12.50", category_id=1)
     _create(db, type="expense", amount="7.50", category_id=1)
-    outcome = handlers.summarize_transactions(db, {"budget_id": 1})
-    assert outcome.reply["totals"]["expense"] == "20.00"
-    assert outcome.reply["totals"]["net"] == "-20.00"
+    outcome = handlers.summarize_by_category(db, {"budget_id": 1})
+    assert outcome.reply[0]["expense"] == "20.00"

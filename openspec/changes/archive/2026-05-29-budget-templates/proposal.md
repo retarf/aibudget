@@ -23,6 +23,9 @@ pairs from scratch every time.
   both aggregate and per-category level. Categories with a planned allocation but
   no transactions appear with actual `"0.00"`. The gateway merges allocation data
   from budget-service with actuals from transaction-service.
+- Add a dedicated **Templates page** with its own navigation entry, allowing
+  users to create templates, manage their line items (add/remove a category
+  with a planned amount), and delete templates.
 - Update the **budget creation form** to include an optional template selector.
   Users can also apply a template to an existing budget at any time.
 
@@ -34,6 +37,8 @@ pairs from scratch every time.
 - `allocation-api`: REST endpoints for planned allocation CRUD on a budget.
 - `budget-service-planning`: budget-service NATS handlers for templates and
   allocations; cascade behaviour when a referenced category is deleted.
+- `template-pages`: frontend page for creating and managing templates and
+  their line items, reachable from the main navigation.
 
 ### Modified Capabilities
 
@@ -55,7 +60,8 @@ pairs from scratch every time.
   `allocations`); no changes to other service databases.
 - **APIs**: new REST routes are additive; `GET /budgets/{id}/summary` response
   shape changes (breaking: adds `planned_totals` and `categories` fields).
-- **Frontend**: template selector in budget creation form; allocation management
-  UI on the budget detail page; updated summary display.
+- **Frontend**: new Templates page (list + create + item management + delete)
+  with a navigation entry; template selector in the budget creation form;
+  allocation management UI on the budget detail page; updated summary display.
 - **Events**: budget-service subscribes to `category.deleted` to cascade-delete
   template line items referencing the removed category.

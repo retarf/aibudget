@@ -1,11 +1,18 @@
 /** Typed REST API client. Every backend endpoint is wrapped here. */
 import type {
+  Allocation,
+  AllocationCreate,
+  AllocationUpdate,
   Budget,
   BudgetInput,
   BudgetSummary,
   Category,
   CategoryCreate,
   CategoryKind,
+  Template,
+  TemplateDetail,
+  TemplateItem,
+  TemplateItemCreate,
   Transaction,
   TransactionInput,
 } from "./types";
@@ -101,4 +108,51 @@ export const api = {
     }),
   deleteCategory: (id: number) =>
     request<void>(`/categories/${id}`, { method: "DELETE" }),
+
+  // --- Templates ---
+  listTemplates: () => request<Template[]>("/templates"),
+  getTemplate: (id: number) => request<TemplateDetail>(`/templates/${id}`),
+  createTemplate: (name: string) =>
+    request<Template>("/templates", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    }),
+  deleteTemplate: (id: number) =>
+    request<void>(`/templates/${id}`, { method: "DELETE" }),
+  addTemplateItem: (templateId: number, data: TemplateItemCreate) =>
+    request<TemplateItem>(`/templates/${templateId}/items`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  deleteTemplateItem: (templateId: number, itemId: number) =>
+    request<void>(`/templates/${templateId}/items/${itemId}`, {
+      method: "DELETE",
+    }),
+  applyTemplate: (budgetId: number, templateId: number) =>
+    request<Allocation[]>(`/budgets/${budgetId}/apply-template`, {
+      method: "POST",
+      body: JSON.stringify({ template_id: templateId }),
+    }),
+
+  // --- Allocations ---
+  listAllocations: (budgetId: number) =>
+    request<Allocation[]>(`/budgets/${budgetId}/allocations`),
+  createAllocation: (budgetId: number, data: AllocationCreate) =>
+    request<Allocation>(`/budgets/${budgetId}/allocations`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateAllocation: (
+    budgetId: number,
+    allocationId: number,
+    data: AllocationUpdate,
+  ) =>
+    request<Allocation>(`/budgets/${budgetId}/allocations/${allocationId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  deleteAllocation: (budgetId: number, allocationId: number) =>
+    request<void>(`/budgets/${budgetId}/allocations/${allocationId}`, {
+      method: "DELETE",
+    }),
 };
