@@ -1,0 +1,21 @@
+# Git pre-commit checks. Install once with: pyenv exec pre-commit install
+#
+# These mirror the Claude Code Stop hook (.claude/hooks/ruff-stop.sh) so hand
+# commits are held to the same bar. They reuse the ruff pinned in
+# requirements-dev.txt via `pyenv exec` (single source of truth), and are
+# report-only: a failing commit is fixed with `ruff format` / `ruff check --fix`.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: pyenv exec ruff check
+        language: system
+        types: [python]
+        files: ^(backend|aibudget_cli)/
+      - id: ruff-format
+        name: ruff format --check
+        entry: pyenv exec ruff format --check
+        language: system
+        types: [python]
+        files: ^(backend|aibudget_cli)/

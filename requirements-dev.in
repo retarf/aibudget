@@ -2,3 +2,4 @@
 # (Dockerfiles install requirements.txt only). Compile with:
 #   pyenv exec pip-compile requirements-dev.in
 ruff==0.15.15
+pre-commit==4.6.0
