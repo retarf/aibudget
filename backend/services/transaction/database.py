@@ -4,6 +4,7 @@ transaction-service owns this database exclusively (database-per-service). It
 holds the `transactions` table plus the `budget_projection` /
 `category_projection` read-models built from other services' events.
 """
+
 import os
 
 from sqlalchemy import create_engine

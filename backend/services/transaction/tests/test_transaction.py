@@ -1,9 +1,8 @@
 """Tests for transaction-service: handlers, projection, and cascades."""
+
 from datetime import date
 
 import pytest
-from sqlalchemy import select
-
 from backend.common.messaging import ServiceError
 from backend.common.schemas import CategoryKind
 from backend.services.transaction import handlers, projection
@@ -12,6 +11,7 @@ from backend.services.transaction.models import (
     CategoryProjection,
     Transaction,
 )
+from sqlalchemy import select
 
 
 def _seed_budget(db, budget_id=1, start="2026-05-01", end="2026-05-31"):
@@ -27,11 +27,7 @@ def _seed_budget(db, budget_id=1, start="2026-05-01", end="2026-05-31"):
 
 
 def _seed_category(db, category_id=1):
-    db.add(
-        CategoryProjection(
-            id=category_id, name="Rent", kind=CategoryKind.expense
-        )
-    )
+    db.add(CategoryProjection(id=category_id, name="Rent", kind=CategoryKind.expense))
     db.commit()
 
 
@@ -48,6 +44,7 @@ def _create(db, **overrides):
 
 
 # --- handler validation against the projection ------------------------------
+
 
 def test_create_with_valid_references_succeeds(db):
     _seed_budget(db)
@@ -103,15 +100,14 @@ def test_list_get_update_delete(db):
     assert updated.reply["amount"] == "25.00"
     assert updated.event_change == "updated"
 
-    deleted = handlers.delete_transaction(
-        db, {"transaction_id": transaction_id}
-    )
+    deleted = handlers.delete_transaction(db, {"transaction_id": transaction_id})
     assert deleted.event_change == "deleted"
     with pytest.raises(ServiceError):
         handlers.get_transaction(db, {"transaction_id": transaction_id})
 
 
 # --- projection consumers ---------------------------------------------------
+
 
 def test_budget_event_updates_projection(db):
     projection.apply_event(
@@ -159,12 +155,9 @@ def test_category_deleted_cascades_transactions(db):
 
 # --- summary ----------------------------------------------------------------
 
+
 def _seed_income_category(db, category_id=2):
-    db.add(
-        CategoryProjection(
-            id=category_id, name="Salary", kind=CategoryKind.income
-        )
-    )
+    db.add(CategoryProjection(id=category_id, name="Salary", kind=CategoryKind.income))
     db.commit()
 
 

@@ -3,6 +3,7 @@
 Exposes the same REST contract as the monolith and translates each request
 into a NATS request/reply call to the owning domain service.
 """
+
 import os
 from contextlib import asynccontextmanager
 

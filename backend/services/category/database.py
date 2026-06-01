@@ -3,6 +3,7 @@
 category-service owns this database exclusively (database-per-service); no
 other service connects to it.
 """
+
 import os
 
 from sqlalchemy import create_engine

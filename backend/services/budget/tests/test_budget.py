@@ -1,6 +1,6 @@
 """Tests for budget-service handlers."""
-import pytest
 
+import pytest
 from backend.common.messaging import ServiceError
 from backend.services.budget import handlers
 

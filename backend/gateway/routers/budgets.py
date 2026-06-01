@@ -1,4 +1,5 @@
 """Budget REST routes — same contract as the monolith, served over NATS."""
+
 from fastapi import APIRouter, status
 
 from backend.common.schemas import BudgetCreate, BudgetRead, BudgetUpdate

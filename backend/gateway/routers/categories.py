@@ -1,4 +1,5 @@
 """Category REST routes — same contract as the monolith, served over NATS."""
+
 from fastapi import APIRouter, status
 
 from backend.common.schemas import CategoryCreate, CategoryKind, CategoryRead
@@ -8,9 +9,7 @@ from ..nats_client import call
 router = APIRouter(prefix="/categories", tags=["categories"])
 
 
-@router.post(
-    "", response_model=CategoryRead, status_code=status.HTTP_201_CREATED
-)
+@router.post("", response_model=CategoryRead, status_code=status.HTTP_201_CREATED)
 async def create_category(data: CategoryCreate):
     return await call("category.create", data.model_dump(mode="json"))
 

@@ -4,6 +4,7 @@ Subscribes to the `transaction.*` request/reply subjects, and to `budget.*` /
 `category.*` events that feed the local projections and drive the delete
 cascades. Publishes `transaction.{created,updated,deleted}` events on change.
 """
+
 import asyncio
 import signal
 
@@ -45,9 +46,7 @@ async def main() -> None:
     event_cb = make_event_callback(SessionLocal, apply_event)
     for subject in CONSUMED_EVENTS:
         # Queue group: instances share one database, so one applies each event.
-        await nc.subscribe(
-            subject, queue=f"{DOMAIN}-service-events", cb=event_cb
-        )
+        await nc.subscribe(subject, queue=f"{DOMAIN}-service-events", cb=event_cb)
 
     print(f"{DOMAIN}-service ready", flush=True)
 

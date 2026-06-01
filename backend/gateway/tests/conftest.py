@@ -3,8 +3,8 @@
 The gateway's NATS layer is mocked: tests patch `gateway.nats_client.request`
 (the request/reply call) and the held connection, so no NATS server is needed.
 """
-import pytest
 
+import pytest
 from backend.gateway import nats_client
 
 

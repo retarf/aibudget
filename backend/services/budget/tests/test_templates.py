@@ -1,6 +1,6 @@
 """Tests for budget-service template handlers."""
-import pytest
 
+import pytest
 from backend.common.messaging import ServiceError
 from backend.services.budget import handlers
 
@@ -91,9 +91,7 @@ def test_delete_template_item_removes_it(db):
         db,
         {"template_id": template_id, "category_id": 1, "planned_amount": "10.00"},
     ).reply["id"]
-    handlers.delete_template_item(
-        db, {"template_id": template_id, "item_id": item_id}
-    )
+    handlers.delete_template_item(db, {"template_id": template_id, "item_id": item_id})
     outcome = handlers.get_template(db, {"template_id": template_id})
     assert outcome.reply["items"] == []
 
@@ -150,16 +148,12 @@ def test_apply_template_merges_existing_allocations(db):
 def test_apply_unknown_template_returns_404(db):
     budget_id = _create_budget(db).reply["id"]
     with pytest.raises(ServiceError) as exc:
-        handlers.apply_template(
-            db, {"budget_id": budget_id, "template_id": 999}
-        )
+        handlers.apply_template(db, {"budget_id": budget_id, "template_id": 999})
     assert exc.value.status == 404
 
 
 def test_apply_to_unknown_budget_returns_404(db):
     template_id = _create_template(db).reply["id"]
     with pytest.raises(ServiceError) as exc:
-        handlers.apply_template(
-            db, {"budget_id": 999, "template_id": template_id}
-        )
+        handlers.apply_template(db, {"budget_id": 999, "template_id": template_id})
     assert exc.value.status == 404
