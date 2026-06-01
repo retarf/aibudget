@@ -4,6 +4,7 @@ The gateway holds a single NATS connection for its lifetime. `call` issues a
 request/reply to a domain service and translates the reply envelope (or a
 timeout) into an HTTP result, so route handlers stay thin.
 """
+
 import nats.errors
 from fastapi import HTTPException
 from nats.aio.client import Client as NATSClient
@@ -27,9 +28,7 @@ async def close_nats() -> None:
 
 def _require_nats() -> NATSClient:
     if _nc is None or not _nc.is_connected:
-        raise HTTPException(
-            status_code=503, detail="Gateway is not connected to NATS"
-        )
+        raise HTTPException(status_code=503, detail="Gateway is not connected to NATS")
     return _nc
 
 
@@ -42,11 +41,11 @@ async def call(subject: str, payload: dict):
     nc = _require_nats()
     try:
         reply = await request(nc, subject, payload)
-    except (nats.errors.TimeoutError, nats.errors.NoRespondersError):
+    except (nats.errors.TimeoutError, nats.errors.NoRespondersError) as err:
         raise HTTPException(
             status_code=503,
             detail=f"The service handling '{subject}' is unavailable",
-        )
+        ) from err
     if not reply.get("ok"):
         error = reply.get("error") or {}
         raise HTTPException(
@@ -67,9 +66,7 @@ async def health_check() -> dict:
     services: dict[str, str] = {}
     for domain in DOMAINS:
         try:
-            reply = await request(
-                _nc, rpc_subject(domain, "health"), {}, timeout=2
-            )
+            reply = await request(_nc, rpc_subject(domain, "health"), {}, timeout=2)
             ok = bool(reply.get("ok"))
         except (nats.errors.TimeoutError, nats.errors.NoRespondersError):
             ok = False

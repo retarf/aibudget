@@ -5,6 +5,7 @@
 delivered more than once leaves the same state — and `deleted` events also
 cascade-delete the affected transactions.
 """
+
 from datetime import date
 
 from sqlalchemy import delete as sa_delete
@@ -38,9 +39,7 @@ def _apply_budget_event(db: Session, event: str, data: dict) -> None:
     elif event == "budget.deleted":
         budget_id = data["id"]
         # Cascade: drop the budget's transactions, then the projection row.
-        db.execute(
-            sa_delete(Transaction).where(Transaction.budget_id == budget_id)
-        )
+        db.execute(sa_delete(Transaction).where(Transaction.budget_id == budget_id))
         projected = db.get(BudgetProjection, budget_id)
         if projected is not None:
             db.delete(projected)
@@ -60,11 +59,7 @@ def _apply_category_event(db: Session, event: str, data: dict) -> None:
     elif event == "category.deleted":
         category_id = data["id"]
         # Cascade: drop transactions classified by the category, then the row.
-        db.execute(
-            sa_delete(Transaction).where(
-                Transaction.category_id == category_id
-            )
-        )
+        db.execute(sa_delete(Transaction).where(Transaction.category_id == category_id))
         projected = db.get(CategoryProjection, category_id)
         if projected is not None:
             db.delete(projected)

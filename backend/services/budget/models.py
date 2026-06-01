@@ -1,4 +1,5 @@
 """ORM models for budget-service."""
+
 from datetime import date
 from decimal import Decimal
 
@@ -74,9 +75,7 @@ class TemplateItem(Base):
         index=True,
     )
     category_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    planned_amount: Mapped[Decimal] = mapped_column(
-        Numeric(12, 2), nullable=False
-    )
+    planned_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
 
     template: Mapped[Template] = relationship(back_populates="items")
 
@@ -102,8 +101,6 @@ class Allocation(Base):
         index=True,
     )
     category_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    planned_amount: Mapped[Decimal] = mapped_column(
-        Numeric(12, 2), nullable=False
-    )
+    planned_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
 
     budget: Mapped[Budget] = relationship(back_populates="allocations")

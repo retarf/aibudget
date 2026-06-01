@@ -3,6 +3,7 @@
 Subscribes to the `category.*` request/reply subjects and serves them from its
 own database, publishing `category.{created,deleted}` events on change.
 """
+
 import asyncio
 import signal
 

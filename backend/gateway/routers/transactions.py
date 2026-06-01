@@ -5,6 +5,7 @@ for retrieve/update/delete. The summary route aggregates two NATS calls — the
 budget's planned allocations from budget-service and the per-category actual
 sums from transaction-service — and merges them into a single response.
 """
+
 import asyncio
 from decimal import Decimal
 
@@ -39,9 +40,7 @@ async def create_transaction(budget_id: int, data: TransactionCreate):
     )
 
 
-@router.get(
-    "/budgets/{budget_id}/transactions", response_model=list[TransactionRead]
-)
+@router.get("/budgets/{budget_id}/transactions", response_model=list[TransactionRead])
 async def list_transactions(budget_id: int):
     return await call("transaction.list", {"budget_id": budget_id})
 
@@ -50,13 +49,9 @@ async def list_transactions(budget_id: int):
 async def summarize_budget(budget_id: int):
     allocations, actuals = await asyncio.gather(
         call("budget.allocation.list", {"budget_id": budget_id}),
-        call(
-            "transaction.summary.categories", {"budget_id": budget_id}
-        ),
+        call("transaction.summary.categories", {"budget_id": budget_id}),
     )
-    return _merge_summary(budget_id, allocations, actuals).model_dump(
-        mode="json"
-    )
+    return _merge_summary(budget_id, allocations, actuals).model_dump(mode="json")
 
 
 def _merge_summary(
@@ -125,9 +120,7 @@ def _actual_for_kind(row: dict) -> Decimal:
 
 @router.get("/transactions/{transaction_id}", response_model=TransactionRead)
 async def get_transaction(transaction_id: int):
-    return await call(
-        "transaction.get", {"transaction_id": transaction_id}
-    )
+    return await call("transaction.get", {"transaction_id": transaction_id})
 
 
 @router.put("/transactions/{transaction_id}", response_model=TransactionRead)
@@ -138,8 +131,6 @@ async def update_transaction(transaction_id: int, data: TransactionUpdate):
     )
 
 
-@router.delete(
-    "/transactions/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/transactions/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_transaction(transaction_id: int):
     await call("transaction.delete", {"transaction_id": transaction_id})

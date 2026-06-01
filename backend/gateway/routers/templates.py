@@ -1,4 +1,5 @@
 """Template REST routes — translated to budget-service over NATS."""
+
 from fastapi import APIRouter, status
 
 from backend.common.schemas import (
@@ -17,9 +18,7 @@ from ..nats_client import call
 router = APIRouter(prefix="/templates", tags=["templates"])
 
 
-@router.post(
-    "", response_model=TemplateRead, status_code=status.HTTP_201_CREATED
-)
+@router.post("", response_model=TemplateRead, status_code=status.HTTP_201_CREATED)
 async def create_template(data: TemplateCreate):
     return await call("budget.template.create", data.model_dump(mode="json"))
 

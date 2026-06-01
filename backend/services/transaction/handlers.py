@@ -5,6 +5,7 @@ is ``_validate``: instead of reading the ``Budget`` and ``Category`` tables
 directly, it reads the local ``BudgetProjection`` / ``CategoryProjection``
 read-models fed by events (eventually consistent — see design.md).
 """
+
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -51,9 +52,7 @@ def _validate(
 ) -> None:
     """Domain rules beyond field validation, checked against the projections."""
     if not budget.start_date <= data.date <= budget.end_date:
-        raise ServiceError(
-            422, "Transaction date is outside the budget period"
-        )
+        raise ServiceError(422, "Transaction date is outside the budget period")
     if db.get(CategoryProjection, data.category_id) is None:
         raise ServiceError(422, "Category does not exist")
 
@@ -137,9 +136,7 @@ def summarize_by_category(db: Session, request: dict) -> Outcome:
     summary: dict[tuple[int, TransactionType], dict[str, Decimal]] = {}
     for category_id, tx_type, total in rows:
         key = (category_id, tx_type)
-        bucket = summary.setdefault(
-            key, {"income": _ZERO, "expense": _ZERO}
-        )
+        bucket = summary.setdefault(key, {"income": _ZERO, "expense": _ZERO})
         bucket[tx_type.value] = Decimal(total).quantize(_ZERO)
 
     reply = [

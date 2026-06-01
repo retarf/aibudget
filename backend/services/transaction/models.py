@@ -4,6 +4,7 @@
 `CategoryProjection` are local read-models maintained from `budget.*` /
 `category.*` events and used to validate transaction references.
 """
+
 from datetime import date
 from decimal import Decimal
 
@@ -27,12 +28,8 @@ class Transaction(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     budget_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    category_id: Mapped[int] = mapped_column(
-        Integer, nullable=False, index=True
-    )
-    type: Mapped[TransactionType] = mapped_column(
-        Enum(TransactionType), nullable=False
-    )
+    category_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    type: Mapped[TransactionType] = mapped_column(Enum(TransactionType), nullable=False)
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
 
@@ -55,6 +52,4 @@ class CategoryProjection(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    kind: Mapped[CategoryKind] = mapped_column(
-        Enum(CategoryKind), nullable=False
-    )
+    kind: Mapped[CategoryKind] = mapped_column(Enum(CategoryKind), nullable=False)

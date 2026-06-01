@@ -135,16 +135,29 @@ def _run_openspec(project_root, *args):
     )
 
     docker_cmd = [
-        "docker", "run", "--rm", "-i",
+        "docker",
+        "run",
+        "--rm",
+        "-i",
         # Keep generated files owned by the invoking user, not root.
-        "--user", f"{os.getuid()}:{os.getgid()}",
-        "-e", "HOME=/tmp",
-        "-e", "npm_config_cache=/tmp/.npm",
-        "-v", f"{project_root}:/workspace",
-        "-v", f"{dev_dir}:/opt/openspec",
-        "-w", "/workspace",
+        "--user",
+        f"{os.getuid()}:{os.getgid()}",
+        "-e",
+        "HOME=/tmp",
+        "-e",
+        "npm_config_cache=/tmp/.npm",
+        "-v",
+        f"{project_root}:/workspace",
+        "-v",
+        f"{dev_dir}:/opt/openspec",
+        "-w",
+        "/workspace",
         OPENSPEC_IMAGE,
-        "sh", "-c", container_script, "sh", *args,
+        "sh",
+        "-c",
+        container_script,
+        "sh",
+        *args,
     ]
     # Attach a TTY when running interactively so openspec prompts work.
     if sys.stdin.isatty():
@@ -233,9 +246,7 @@ TEST_TARGETS = {
 
 
 @cli.command(context_settings={"ignore_unknown_options": True})
-@click.argument(
-    "target", type=click.Choice([*TEST_TARGETS, "all"]), default="all"
-)
+@click.argument("target", type=click.Choice([*TEST_TARGETS, "all"]), default="all")
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def test(ctx, target, args):
@@ -245,15 +256,20 @@ def test(ctx, target, args):
     (the default). Extra ARGS/flags are forwarded to pytest, e.g.
     `cli test budget -k create`.
     """
-    selected = (
-        TEST_TARGETS if target == "all" else {target: TEST_TARGETS[target]}
-    )
+    selected = TEST_TARGETS if target == "all" else {target: TEST_TARGETS[target]}
     for name, (service, path) in selected.items():
         click.echo(f"# {name} tests")
         _run_compose(
             ctx.obj["project_root"],
-            "run", "--rm", "--no-deps", service,
-            "python", "-m", "pytest", path, *args,
+            "run",
+            "--rm",
+            "--no-deps",
+            service,
+            "python",
+            "-m",
+            "pytest",
+            path,
+            *args,
         )
 
 
@@ -273,8 +289,14 @@ def frontend_test(ctx, args):
     """
     _run_compose(
         ctx.obj["project_root"],
-        "run", "--rm", "--no-deps", "frontend",
-        "npm", "test", "--", *args,
+        "run",
+        "--rm",
+        "--no-deps",
+        "frontend",
+        "npm",
+        "test",
+        "--",
+        *args,
     )
 
 

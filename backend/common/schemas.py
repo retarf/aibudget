@@ -4,6 +4,7 @@ Shared by the gateway (as FastAPI request/response models, so invalid bodies
 still yield 422) and by the services (to validate NATS payloads and shape
 replies). ORM models live per-service; only these transport types are shared.
 """
+
 import enum
 from datetime import date
 from decimal import Decimal
@@ -11,14 +12,14 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
-class CategoryKind(str, enum.Enum):
+class CategoryKind(enum.StrEnum):
     """Whether a category classifies incomes or expenses."""
 
     income = "income"
     expense = "expense"
 
 
-class TransactionType(str, enum.Enum):
+class TransactionType(enum.StrEnum):
     """Whether a transaction is an income or an expense."""
 
     income = "income"
@@ -26,6 +27,7 @@ class TransactionType(str, enum.Enum):
 
 
 # --- budget ------------------------------------------------------------------
+
 
 class _BudgetInput(BaseModel):
     """Shared request fields for creating or updating a budget."""
@@ -62,6 +64,7 @@ class BudgetRead(BaseModel):
 
 # --- category ----------------------------------------------------------------
 
+
 class CategoryCreate(BaseModel):
     """Request body for creating a category."""
 
@@ -80,6 +83,7 @@ class CategoryRead(BaseModel):
 
 
 # --- transaction -------------------------------------------------------------
+
 
 class _TransactionInput(BaseModel):
     """Shared request fields for recording or updating a transaction."""
@@ -112,6 +116,7 @@ class TransactionRead(BaseModel):
 
 
 # --- templates ---------------------------------------------------------------
+
 
 class TemplateCreate(BaseModel):
     """Request body for creating a budget template."""
@@ -169,6 +174,7 @@ class ApplyTemplateRequest(BaseModel):
 
 # --- allocations -------------------------------------------------------------
 
+
 class AllocationCreate(BaseModel):
     """Request body for creating a planned allocation on a budget."""
 
@@ -194,6 +200,7 @@ class AllocationRead(BaseModel):
 
 
 # --- summary -----------------------------------------------------------------
+
 
 class BudgetSummaryTotals(BaseModel):
     """Planned vs actual income/expense totals for a single budget."""

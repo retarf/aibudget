@@ -5,6 +5,7 @@ own database, publishing `budget.{created,updated,deleted}` events on change.
 Also consumes `category.deleted` to cascade-delete template line items that
 reference the removed category.
 """
+
 import asyncio
 import signal
 
@@ -40,9 +41,7 @@ async def main() -> None:
 
     event_cb = make_event_callback(SessionLocal, apply_event)
     for subject in CONSUMED_EVENTS:
-        await nc.subscribe(
-            subject, queue=f"{DOMAIN}-service-events", cb=event_cb
-        )
+        await nc.subscribe(subject, queue=f"{DOMAIN}-service-events", cb=event_cb)
 
     print(f"{DOMAIN}-service ready", flush=True)
 

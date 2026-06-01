@@ -1,4 +1,5 @@
 """Planned allocation REST routes — translated to budget-service over NATS."""
+
 from fastapi import APIRouter, status
 
 from backend.common.schemas import (
@@ -36,9 +37,7 @@ async def create_allocation(budget_id: int, data: AllocationCreate):
     "/budgets/{budget_id}/allocations/{allocation_id}",
     response_model=AllocationRead,
 )
-async def update_allocation(
-    budget_id: int, allocation_id: int, data: AllocationUpdate
-):
+async def update_allocation(budget_id: int, allocation_id: int, data: AllocationUpdate):
     return await call(
         "budget.allocation.update",
         {

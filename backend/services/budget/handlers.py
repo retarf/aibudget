@@ -5,6 +5,7 @@ operation and returns the reply payload plus, for state changes, the domain
 event to publish. Ported from the monolith's ``backend/services/budget.py``,
 with ``HTTPException`` replaced by ``ServiceError``.
 """
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -64,18 +65,14 @@ def _get_template(db: Session, template_id: int) -> Template:
     return template
 
 
-def _get_template_item(
-    db: Session, template_id: int, item_id: int
-) -> TemplateItem:
+def _get_template_item(db: Session, template_id: int, item_id: int) -> TemplateItem:
     item = db.get(TemplateItem, item_id)
     if item is None or item.template_id != template_id:
         raise ServiceError(404, "Template item not found")
     return item
 
 
-def _get_allocation(
-    db: Session, budget_id: int, allocation_id: int
-) -> Allocation:
+def _get_allocation(db: Session, budget_id: int, allocation_id: int) -> Allocation:
     allocation = db.get(Allocation, allocation_id)
     if allocation is None or allocation.budget_id != budget_id:
         raise ServiceError(404, "Allocation not found")
@@ -84,9 +81,7 @@ def _get_allocation(
 
 def create_budget(db: Session, request: dict) -> Outcome:
     data = BudgetCreate.model_validate(request)
-    budget = Budget(
-        name=data.name, start_date=data.start_date, end_date=data.end_date
-    )
+    budget = Budget(name=data.name, start_date=data.start_date, end_date=data.end_date)
     db.add(budget)
     db.commit()
     db.refresh(budget)
@@ -120,12 +115,11 @@ def delete_budget(db: Session, request: dict) -> Outcome:
     budget_id = budget.id
     db.delete(budget)
     db.commit()
-    return Outcome(
-        reply=None, event_change="deleted", event_data={"id": budget_id}
-    )
+    return Outcome(reply=None, event_change="deleted", event_data={"id": budget_id})
 
 
 # --- templates ---------------------------------------------------------------
+
 
 def create_template(db: Session, request: dict) -> Outcome:
     data = TemplateCreate.model_validate(request)
@@ -183,15 +177,13 @@ def add_template_item(db: Session, request: dict) -> Outcome:
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise ServiceError(409, "Category already in template")
+        raise ServiceError(409, "Category already in template") from None
     db.refresh(item)
     return Outcome(reply=_read_template_item(item))
 
 
 def delete_template_item(db: Session, request: dict) -> Outcome:
-    item = _get_template_item(
-        db, request["template_id"], request["item_id"]
-    )
+    item = _get_template_item(db, request["template_id"], request["item_id"])
     db.delete(item)
     db.commit()
     return Outcome(reply=None)
@@ -203,14 +195,11 @@ def apply_template(db: Session, request: dict) -> Outcome:
     items = db.scalars(
         select(TemplateItem).where(TemplateItem.template_id == template.id)
     ).all()
-    existing_categories = {
-        row
-        for row in db.scalars(
-            select(Allocation.category_id).where(
-                Allocation.budget_id == budget.id
-            )
+    existing_categories = set(
+        db.scalars(
+            select(Allocation.category_id).where(Allocation.budget_id == budget.id)
         )
-    }
+    )
     created: list[Allocation] = []
     for item in items:
         if item.category_id in existing_categories:
@@ -229,6 +218,7 @@ def apply_template(db: Session, request: dict) -> Outcome:
 
 
 # --- allocations -------------------------------------------------------------
+
 
 def create_allocation(db: Session, request: dict) -> Outcome:
     budget = _get(db, request["budget_id"])
@@ -251,7 +241,7 @@ def create_allocation(db: Session, request: dict) -> Outcome:
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise ServiceError(409, "Allocation already exists for this category")
+        raise ServiceError(409, "Allocation already exists for this category") from None
     db.refresh(allocation)
     return Outcome(reply=_read_allocation(allocation))
 
@@ -265,9 +255,7 @@ def list_allocations(db: Session, request: dict) -> Outcome:
 
 
 def update_allocation(db: Session, request: dict) -> Outcome:
-    allocation = _get_allocation(
-        db, request["budget_id"], request["allocation_id"]
-    )
+    allocation = _get_allocation(db, request["budget_id"], request["allocation_id"])
     data = AllocationUpdate.model_validate(request)
     allocation.planned_amount = data.planned_amount
     db.commit()
@@ -276,9 +264,7 @@ def update_allocation(db: Session, request: dict) -> Outcome:
 
 
 def delete_allocation(db: Session, request: dict) -> Outcome:
-    allocation = _get_allocation(
-        db, request["budget_id"], request["allocation_id"]
-    )
+    allocation = _get_allocation(db, request["budget_id"], request["allocation_id"])
     db.delete(allocation)
     db.commit()
     return Outcome(reply=None)

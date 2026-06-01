@@ -1,8 +1,8 @@
 """Tests for budget-service event consumers (category.deleted cascade)."""
-from sqlalchemy import select
 
 from backend.services.budget import events, handlers
 from backend.services.budget.models import TemplateItem
+from sqlalchemy import select
 
 
 def _make_template_with_items(db, items):
@@ -20,9 +20,7 @@ def _make_template_with_items(db, items):
 
 
 def test_category_deleted_removes_matching_template_items(db):
-    template_id = _make_template_with_items(
-        db, [(1, "10.00"), (2, "20.00")]
-    )
+    template_id = _make_template_with_items(db, [(1, "10.00"), (2, "20.00")])
 
     events.apply_event(db, "category.deleted", {"id": 1})
 

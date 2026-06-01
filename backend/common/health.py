@@ -3,6 +3,7 @@
 Each service exposes it on `<domain>.health`; the gateway pings these subjects
 to build its own `/health` response.
 """
+
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 

@@ -9,6 +9,7 @@ Two messaging styles are supported:
 * **Events** — used between services. Subjects are ``<domain>.<change>``
   (e.g. ``budget.deleted``). Payloads are ``{"event": ..., "data": ...}``.
 """
+
 import json
 import os
 from collections.abc import Callable
@@ -81,6 +82,7 @@ def _decode(data: bytes) -> dict:
 
 # --- request/reply envelopes -------------------------------------------------
 
+
 def success_envelope(data: Any) -> bytes:
     return _encode({"ok": True, "data": data})
 
@@ -91,11 +93,13 @@ def error_envelope(status: int, detail: str) -> bytes:
 
 # --- event envelopes ---------------------------------------------------------
 
+
 def event_envelope(event: str, data: Any) -> bytes:
     return _encode({"event": event, "data": data})
 
 
 # --- service side: serve request/reply, publish events ----------------------
+
 
 def make_rpc_callback(
     nc: NATSClient,
@@ -119,9 +123,7 @@ def make_rpc_callback(
             await msg.respond(success_envelope(outcome.reply))
             if outcome.event_change:
                 subject = event_subject(domain, outcome.event_change)
-                await nc.publish(
-                    subject, event_envelope(subject, outcome.event_data)
-                )
+                await nc.publish(subject, event_envelope(subject, outcome.event_data))
         except ServiceError as exc:
             await msg.respond(error_envelope(exc.status, exc.detail))
         except Exception as exc:  # noqa: BLE001 - last-resort guard
@@ -152,6 +154,7 @@ def make_event_callback(
 
 
 # --- gateway side: issue request/reply --------------------------------------
+
 
 async def request(
     nc: NATSClient, subject: str, payload: dict, timeout: float = REQUEST_TIMEOUT

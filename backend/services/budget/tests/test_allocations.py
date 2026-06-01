@@ -1,6 +1,6 @@
 """Tests for budget-service allocation handlers."""
-import pytest
 
+import pytest
 from backend.common.messaging import ServiceError
 from backend.services.budget import handlers
 
@@ -51,9 +51,9 @@ def test_create_allocation_unknown_budget_returns_404(db):
 
 def test_list_allocations_returns_only_budget_rows(db):
     budget_a = _create_budget(db, name="A").reply["id"]
-    budget_b = _create_budget(
-        db, name="B", start="2026-06-01", end="2026-06-30"
-    ).reply["id"]
+    budget_b = _create_budget(db, name="B", start="2026-06-01", end="2026-06-30").reply[
+        "id"
+    ]
     handlers.create_allocation(
         db,
         {"budget_id": budget_a, "category_id": 1, "planned_amount": "100.00"},
@@ -119,9 +119,9 @@ def test_update_unknown_allocation_returns_404(db):
 
 def test_allocation_under_wrong_budget_returns_404(db):
     budget_a = _create_budget(db, name="A").reply["id"]
-    budget_b = _create_budget(
-        db, name="B", start="2026-06-01", end="2026-06-30"
-    ).reply["id"]
+    budget_b = _create_budget(db, name="B", start="2026-06-01", end="2026-06-30").reply[
+        "id"
+    ]
     allocation_id = handlers.create_allocation(
         db,
         {"budget_id": budget_a, "category_id": 1, "planned_amount": "100.00"},

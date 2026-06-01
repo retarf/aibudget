@@ -1,13 +1,13 @@
 """Tests for the gateway: envelope/timeout mapping, routing, and health."""
+
 import asyncio
 
 import nats.errors
 import pytest
-from fastapi import HTTPException
-from fastapi.testclient import TestClient
-
 from backend.gateway import nats_client
 from backend.gateway.main import app
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
 
 BUDGET = {
     "id": 1,
@@ -18,6 +18,7 @@ BUDGET = {
 
 
 # --- call(): envelope and timeout mapping -----------------------------------
+
 
 def test_call_returns_data_on_success(fake_request):
     fake_request({"budget.list": {"ok": True, "data": [BUDGET]}})
@@ -49,6 +50,7 @@ def test_call_maps_timeout_to_503(fake_request):
 
 # --- routing via TestClient -------------------------------------------------
 
+
 def test_create_budget_route_returns_201(fake_request):
     fake_request({"budget.create": {"ok": True, "data": BUDGET}})
     # No `with` block: skip the app lifespan so no real NATS connect happens.
@@ -76,14 +78,13 @@ def test_error_envelope_surfaces_through_route(fake_request):
         }
     )
     client = TestClient(app)
-    response = client.post(
-        "/categories", json={"name": "Rent", "kind": "expense"}
-    )
+    response = client.post("/categories", json={"name": "Rent", "kind": "expense"})
     assert response.status_code == 409
     assert response.json()["detail"] == "duplicate"
 
 
 # --- health -----------------------------------------------------------------
+
 
 def test_health_ok_when_all_services_respond(fake_request):
     fake_request(
@@ -305,9 +306,7 @@ def test_create_template_route_returns_201(fake_request):
 
 
 def test_list_templates_route(fake_request):
-    fake_request(
-        {"budget.template.list": {"ok": True, "data": [TEMPLATE]}}
-    )
+    fake_request({"budget.template.list": {"ok": True, "data": [TEMPLATE]}})
     client = TestClient(app)
     response = client.get("/templates")
     assert response.status_code == 200
@@ -315,9 +314,7 @@ def test_list_templates_route(fake_request):
 
 
 def test_get_template_route_returns_items(fake_request):
-    fake_request(
-        {"budget.template.get": {"ok": True, "data": TEMPLATE_DETAIL}}
-    )
+    fake_request({"budget.template.get": {"ok": True, "data": TEMPLATE_DETAIL}})
     client = TestClient(app)
     response = client.get("/templates/1")
     assert response.status_code == 200
@@ -367,13 +364,9 @@ def test_apply_template_route_returns_allocations(fake_request):
     allocations = [
         {"id": 1, "budget_id": 1, "category_id": 1, "planned_amount": "100.00"}
     ]
-    fake_request(
-        {"budget.template.apply": {"ok": True, "data": allocations}}
-    )
+    fake_request({"budget.template.apply": {"ok": True, "data": allocations}})
     client = TestClient(app)
-    response = client.post(
-        "/budgets/1/apply-template", json={"template_id": 1}
-    )
+    response = client.post("/budgets/1/apply-template", json={"template_id": 1})
     assert response.status_code == 200
     assert response.json() == allocations
 
@@ -389,9 +382,7 @@ ALLOCATION = {
 
 
 def test_list_allocations_route(fake_request):
-    fake_request(
-        {"budget.allocation.list": {"ok": True, "data": [ALLOCATION]}}
-    )
+    fake_request({"budget.allocation.list": {"ok": True, "data": [ALLOCATION]}})
     client = TestClient(app)
     response = client.get("/budgets/1/allocations")
     assert response.status_code == 200
@@ -399,9 +390,7 @@ def test_list_allocations_route(fake_request):
 
 
 def test_create_allocation_route_returns_201(fake_request):
-    fake_request(
-        {"budget.allocation.create": {"ok": True, "data": ALLOCATION}}
-    )
+    fake_request({"budget.allocation.create": {"ok": True, "data": ALLOCATION}})
     client = TestClient(app)
     response = client.post(
         "/budgets/1/allocations",
@@ -430,13 +419,9 @@ def test_create_allocation_route_surfaces_409(fake_request):
 
 def test_update_allocation_route(fake_request):
     updated = {**ALLOCATION, "planned_amount": "150.00"}
-    fake_request(
-        {"budget.allocation.update": {"ok": True, "data": updated}}
-    )
+    fake_request({"budget.allocation.update": {"ok": True, "data": updated}})
     client = TestClient(app)
-    response = client.put(
-        "/budgets/1/allocations/1", json={"planned_amount": "150.00"}
-    )
+    response = client.put("/budgets/1/allocations/1", json={"planned_amount": "150.00"})
     assert response.status_code == 200
     assert response.json() == updated
 

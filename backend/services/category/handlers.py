@@ -5,6 +5,7 @@ Ported from the monolith's ``backend/services/category.py``. The monolith's
 dropped: category-service cannot see transactions. Cleanup happens via the
 ``category.deleted`` cascade in transaction-service (see design.md).
 """
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -23,9 +24,7 @@ def _read(category: Category) -> dict:
 def create_category(db: Session, request: dict) -> Outcome:
     data = CategoryCreate.model_validate(request)
     existing = db.scalar(
-        select(Category).where(
-            Category.name == data.name, Category.kind == data.kind
-        )
+        select(Category).where(Category.name == data.name, Category.kind == data.kind)
     )
     if existing is not None:
         raise ServiceError(
@@ -54,9 +53,7 @@ def delete_category(db: Session, request: dict) -> Outcome:
     category_id = category.id
     db.delete(category)
     db.commit()
-    return Outcome(
-        reply=None, event_change="deleted", event_data={"id": category_id}
-    )
+    return Outcome(reply=None, event_change="deleted", event_data={"id": category_id})
 
 
 # Maps the operation name in a `category.<operation>` subject to its handler.
