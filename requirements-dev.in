@@ -1,0 +1,4 @@
+# Development-only dependencies. NOT installed into production images
+# (Dockerfiles install requirements.txt only). Compile with:
+#   pyenv exec pip-compile requirements-dev.in
+ruff==0.15.15
