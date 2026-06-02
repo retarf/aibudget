@@ -159,13 +159,19 @@ describe("budget detail totals", () => {
     await userEvent.click(
       screen.getByRole("button", { name: /record transaction/i }),
     );
-    fireEvent.change(await screen.findByLabelText(/Amount/), {
+    const dialog = await screen.findByRole("dialog");
+    await userEvent.click(within(dialog).getByText("Expense"));
+    fireEvent.change(within(dialog).getByLabelText(/Amount/), {
       target: { value: "30.00" },
     });
-    fireEvent.change(screen.getByLabelText(/Date/), {
+    fireEvent.change(within(dialog).getByLabelText(/Date/), {
       target: { value: "2026-05-10" },
     });
-    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    await userEvent.type(within(dialog).getByLabelText("Category"), "Food");
+    fireEvent.keyDown(within(dialog).getByLabelText("Category"), {
+      key: "Enter",
+    });
+    await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
 
     await waitFor(() => expect(getTotal("Actual expense")).toBe("30.00"));
     expect(getTotal("Net")).toBe("-30.00");

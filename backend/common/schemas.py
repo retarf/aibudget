@@ -82,6 +82,21 @@ class CategoryRead(BaseModel):
     kind: CategoryKind
 
 
+class CategoryUsage(BaseModel):
+    """How many records reference a category, across the other services."""
+
+    transactions: int = 0
+    allocations: int = 0
+    templates: int = 0
+
+
+class CategoryWithUsage(CategoryRead):
+    """A category enriched with cross-service usage, for the categories list."""
+
+    in_use: bool
+    usage: CategoryUsage
+
+
 # --- transaction -------------------------------------------------------------
 
 

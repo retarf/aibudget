@@ -1,34 +1,4 @@
-# category-pages Specification
-
-## Purpose
-TBD - created by archiving change frontend-budget-management. Update Purpose after archive.
-## Requirements
-### Requirement: View the category list
-The Categories page SHALL display all categories returned by the REST API.
-
-#### Scenario: Categories are listed
-- **WHEN** the user opens the Categories page
-- **THEN** every existing category is shown with its name and kind
-
-### Requirement: Filter categories by kind
-The Categories page SHALL let the user filter the list by kind (income or
-expense).
-
-#### Scenario: Filtering by kind
-- **WHEN** the user selects a kind filter
-- **THEN** only categories of that kind are shown
-
-### Requirement: Create a category
-The Categories page SHALL let the user create a category by entering a name
-and selecting a kind.
-
-#### Scenario: Category created
-- **WHEN** the user submits the create form with a valid name and kind
-- **THEN** the category is created via the API and appears in the list
-
-#### Scenario: Duplicate category is reported
-- **WHEN** the user submits a category whose name already exists for that kind
-- **THEN** the API rejection is shown as a form error and no category is created
+## MODIFIED Requirements
 
 ### Requirement: Delete a category
 The Categories page SHALL offer the **Delete** action only for a category that
@@ -45,6 +15,8 @@ category list's usage information.
 - **WHEN** the user views a category referenced by a transaction, allocation, or template line item
 - **THEN** the row offers **Erase history** (and not Delete)
 
+## ADDED Requirements
+
 ### Requirement: Erase a category's history
 The Categories page SHALL let the user erase an in-use category's history after
 a confirmation that shows the impact (counts of transactions, planned
@@ -58,4 +30,3 @@ unused and the row SHALL then offer **Delete**.
 #### Scenario: After erasing, the category becomes deletable
 - **WHEN** the user confirms Erase history
 - **THEN** the category's transactions, allocations, and template line items are erased via the API, the list refreshes, and the row now offers **Delete**
-

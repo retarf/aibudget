@@ -14,6 +14,18 @@ export interface CategoryCreate {
   kind: CategoryKind;
 }
 
+export interface CategoryUsage {
+  transactions: number;
+  allocations: number;
+  templates: number;
+}
+
+/** A category as returned by the list endpoint, enriched with usage. */
+export interface CategoryWithUsage extends Category {
+  in_use: boolean;
+  usage: CategoryUsage;
+}
+
 export interface Budget {
   id: number;
   name: string;

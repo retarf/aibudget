@@ -5,6 +5,7 @@ import {
   Group,
   Modal,
   NumberInput,
+  SegmentedControl,
   Select,
   Stack,
   Table,
@@ -14,12 +15,21 @@ import {
 import { type FormEvent, useState } from "react";
 
 import { ApiError, api } from "../api/client";
-import type { Allocation, Category, Template } from "../api/types";
+import type {
+  Allocation,
+  Category,
+  CategoryCreate,
+  CategoryKind,
+  Template,
+} from "../api/types";
 import { useApiResource } from "../hooks/useApiResource";
+import { CategoryCombobox } from "./CategoryCombobox";
 
 interface Props {
   budgetId: number;
   categories: Category[];
+  /** Creates a category inline from the allocation form's category picker. */
+  onCreateCategory: (data: CategoryCreate) => Promise<Category>;
   onChange?: () => void;
 }
 
@@ -27,7 +37,12 @@ interface Props {
  * Lists, edits, and removes planned allocations for one budget; lets the user
  * apply a template to bulk-create them.
  */
-export function AllocationPanel({ budgetId, categories, onChange }: Props) {
+export function AllocationPanel({
+  budgetId,
+  categories,
+  onCreateCategory,
+  onChange,
+}: Props) {
   const allocations = useApiResource(
     () => api.listAllocations(budgetId),
     [budgetId],
@@ -216,6 +231,7 @@ export function AllocationPanel({ budgetId, categories, onChange }: Props) {
         <AddAllocationForm
           categories={categories}
           error={addError}
+          onCreateCategory={onCreateCategory}
           onSubmit={handleAdd}
           onCancel={() => setAdding(false)}
         />
@@ -263,6 +279,7 @@ export function AllocationPanel({ budgetId, categories, onChange }: Props) {
 interface AddAllocationFormProps {
   categories: Category[];
   error?: string;
+  onCreateCategory: (data: CategoryCreate) => Promise<Category>;
   onSubmit: (categoryId: number, plannedAmount: string) => void;
   onCancel: () => void;
 }
@@ -270,32 +287,39 @@ interface AddAllocationFormProps {
 function AddAllocationForm({
   categories,
   error,
+  onCreateCategory,
   onSubmit,
   onCancel,
 }: AddAllocationFormProps) {
-  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [kind, setKind] = useState<CategoryKind | null>(null);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [amount, setAmount] = useState<string>("");
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!categoryId || !amount) return;
-    onSubmit(Number(categoryId), amount);
+    if (categoryId == null || !amount) return;
+    onSubmit(categoryId, amount);
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <Stack>
         {error && <Alert color="red">{error}</Alert>}
-        <Select
-          label="Category"
-          placeholder="Pick a category"
-          data={categories.map((c) => ({
-            value: String(c.id),
-            label: `${c.name} (${c.kind})`,
-          }))}
+        <SegmentedControl
+          aria-label="Kind"
+          data={[
+            { label: "Income", value: "income" },
+            { label: "Expense", value: "expense" },
+          ]}
+          value={kind ?? ""}
+          onChange={(value) => setKind(value as CategoryKind)}
+        />
+        <CategoryCombobox
+          categories={categories}
+          kind={kind}
           value={categoryId}
           onChange={setCategoryId}
-          required
+          onCreateCategory={onCreateCategory}
         />
         <NumberInput
           label="Planned amount"
@@ -310,7 +334,12 @@ function AddAllocationForm({
           <Button variant="default" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">Add</Button>
+          <Button
+            type="submit"
+            disabled={kind == null || categoryId == null || !amount}
+          >
+            Add
+          </Button>
         </Group>
       </Stack>
     </form>

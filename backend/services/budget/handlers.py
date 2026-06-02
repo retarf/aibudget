@@ -6,7 +6,8 @@ event to publish. Ported from the monolith's ``backend/services/budget.py``,
 with ``HTTPException`` replaced by ``ServiceError``.
 """
 
-from sqlalchemy import select
+from sqlalchemy import delete as sa_delete
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -270,6 +271,39 @@ def delete_allocation(db: Session, request: dict) -> Outcome:
     return Outcome(reply=None)
 
 
+# --- category usage / purge (for the gateway's delete guard & erase history) --
+
+
+def category_usage(db: Session, request: dict) -> Outcome:
+    """Count allocations and template line items referencing a category."""
+    category_id = request["category_id"]
+    allocations = db.scalar(
+        select(func.count())
+        .select_from(Allocation)
+        .where(Allocation.category_id == category_id)
+    )
+    template_items = db.scalar(
+        select(func.count())
+        .select_from(TemplateItem)
+        .where(TemplateItem.category_id == category_id)
+    )
+    return Outcome(
+        reply={
+            "allocations": int(allocations or 0),
+            "templates": int(template_items or 0),
+        }
+    )
+
+
+def purge_category(db: Session, request: dict) -> Outcome:
+    """Delete every allocation and template line item for a category (idempotent)."""
+    category_id = request["category_id"]
+    db.execute(sa_delete(Allocation).where(Allocation.category_id == category_id))
+    db.execute(sa_delete(TemplateItem).where(TemplateItem.category_id == category_id))
+    db.commit()
+    return Outcome(reply=None)
+
+
 # Maps the operation name in a `budget.<operation>` subject to its handler.
 # Multi-part operations (e.g. "template.create") resolve to dotted subjects
 # such as ``budget.template.create``.
@@ -292,4 +326,6 @@ HANDLERS = {
     "allocation.list": list_allocations,
     "allocation.update": update_allocation,
     "allocation.delete": delete_allocation,
+    "category.usage": category_usage,
+    "category.purge": purge_category,
 }

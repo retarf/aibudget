@@ -82,6 +82,28 @@ export function seedAllocation(data: Omit<Allocation, "id">): Allocation {
   return allocation;
 }
 
+/** Cross-service usage counts for a category, mirroring the gateway. */
+function usageOf(categoryId: number) {
+  return {
+    transactions: store.transactions.filter((t) => t.category_id === categoryId)
+      .length,
+    allocations: store.allocations.filter((a) => a.category_id === categoryId)
+      .length,
+    templates: store.templateItems.filter((i) => i.category_id === categoryId)
+      .length,
+  };
+}
+
+/** Enrich a category with usage, as the categories list endpoint does. */
+function withUsage(category: Category) {
+  const usage = usageOf(category.id);
+  return {
+    ...category,
+    usage,
+    in_use: usage.transactions + usage.allocations + usage.templates > 0,
+  };
+}
+
 // --- Request handlers mirroring the backend's behavior ---
 
 export const handlers = [
@@ -272,11 +294,10 @@ export const handlers = [
   // Categories
   http.get(`${API}/categories`, ({ request }) => {
     const kind = new URL(request.url).searchParams.get("kind");
-    return HttpResponse.json(
-      kind
-        ? store.categories.filter((c) => c.kind === kind)
-        : store.categories,
-    );
+    const visible = kind
+      ? store.categories.filter((c) => c.kind === kind)
+      : store.categories;
+    return HttpResponse.json(visible.map(withUsage));
   }),
 
   http.post(`${API}/categories`, async ({ request }) => {
@@ -297,13 +318,24 @@ export const handlers = [
 
   http.delete(`${API}/categories/:id`, ({ params }) => {
     const id = Number(params.id);
-    if (store.transactions.some((t) => t.category_id === id)) {
+    const usage = usageOf(id);
+    if (usage.transactions + usage.allocations + usage.templates > 0) {
       return HttpResponse.json(
-        { detail: "Category is referenced by a transaction" },
+        { detail: "Category is in use and cannot be deleted" },
         { status: 409 },
       );
     }
     store.categories = store.categories.filter((c) => c.id !== id);
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post(`${API}/categories/:id/erase-history`, ({ params }) => {
+    const id = Number(params.id);
+    store.transactions = store.transactions.filter((t) => t.category_id !== id);
+    store.allocations = store.allocations.filter((a) => a.category_id !== id);
+    store.templateItems = store.templateItems.filter(
+      (i) => i.category_id !== id,
+    );
     return new HttpResponse(null, { status: 204 });
   }),
 

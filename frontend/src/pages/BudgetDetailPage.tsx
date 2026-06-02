@@ -160,6 +160,7 @@ export function BudgetDetailPage() {
       <AllocationPanel
         budgetId={id}
         categories={categories.data ?? []}
+        onCreateCategory={handleCreateCategory}
         onChange={summary.reload}
       />
 

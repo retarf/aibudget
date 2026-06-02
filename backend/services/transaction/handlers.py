@@ -8,6 +8,7 @@ read-models fed by events (eventually consistent — see design.md).
 
 from decimal import Decimal
 
+from sqlalchemy import delete as sa_delete
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -53,8 +54,11 @@ def _validate(
     """Domain rules beyond field validation, checked against the projections."""
     if not budget.start_date <= data.date <= budget.end_date:
         raise ServiceError(422, "Transaction date is outside the budget period")
-    if db.get(CategoryProjection, data.category_id) is None:
+    category = db.get(CategoryProjection, data.category_id)
+    if category is None:
         raise ServiceError(422, "Category does not exist")
+    if category.kind.value != data.type.value:
+        raise ServiceError(422, "Category kind does not match the transaction type")
 
 
 def create_transaction(db: Session, request: dict) -> Outcome:
@@ -117,8 +121,9 @@ def summarize_by_category(db: Session, request: dict) -> Outcome:
     """Per-category actual income/expense sums for the gateway summary.
 
     Returns one row per ``(category_id, kind)`` pair appearing in the budget's
-    transactions. ``kind`` matches the transaction type, since a single
-    category may legitimately appear under both kinds in this domain.
+    transactions. ``kind`` is taken from the transaction type, which — since
+    ``_validate`` rejects a category whose kind differs from the type — always
+    equals the referenced category's kind for any stored transaction.
     """
     budget_id = request["budget_id"]
     _get_budget(db, budget_id)  # 404 if the budget is unknown
@@ -151,6 +156,25 @@ def summarize_by_category(db: Session, request: dict) -> Outcome:
     return Outcome(reply=reply)
 
 
+def category_usage(db: Session, request: dict) -> Outcome:
+    """Count transactions referencing a category, for the gateway's delete guard."""
+    count = db.scalar(
+        select(func.count())
+        .select_from(Transaction)
+        .where(Transaction.category_id == request["category_id"])
+    )
+    return Outcome(reply={"transactions": int(count or 0)})
+
+
+def purge_category(db: Session, request: dict) -> Outcome:
+    """Delete every transaction referencing a category (idempotent)."""
+    db.execute(
+        sa_delete(Transaction).where(Transaction.category_id == request["category_id"])
+    )
+    db.commit()
+    return Outcome(reply=None)
+
+
 # Maps the operation name in a `transaction.<operation>` subject to its handler.
 HANDLERS = {
     "create": create_transaction,
@@ -159,5 +183,7 @@ HANDLERS = {
     "update": update_transaction,
     "delete": delete_transaction,
     "summary.categories": summarize_by_category,
+    "category.usage": category_usage,
+    "category.purge": purge_category,
     "health": health_handler,
 }

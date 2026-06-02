@@ -431,3 +431,69 @@ def test_delete_allocation_route_returns_204(fake_request):
     client = TestClient(app)
     response = client.delete("/budgets/1/allocations/1")
     assert response.status_code == 204
+
+
+# --- category usage, delete guard, erase history ----------------------------
+
+CATEGORY = {"id": 1, "name": "Food", "kind": "expense"}
+
+
+def _usage(transactions=0, allocations=0, templates=0):
+    return {
+        "transaction.category.usage": {
+            "ok": True,
+            "data": {"transactions": transactions},
+        },
+        "budget.category.usage": {
+            "ok": True,
+            "data": {"allocations": allocations, "templates": templates},
+        },
+    }
+
+
+def test_list_categories_enriched_with_usage(fake_request):
+    fake_request(
+        {
+            "category.list": {"ok": True, "data": [CATEGORY]},
+            **_usage(transactions=3, allocations=1, templates=2),
+        }
+    )
+    client = TestClient(app)
+    response = client.get("/categories")
+    assert response.status_code == 200
+    body = response.json()[0]
+    assert body["in_use"] is True
+    assert body["usage"] == {"transactions": 3, "allocations": 1, "templates": 2}
+
+
+def test_delete_unused_category_succeeds(fake_request):
+    fake_request(
+        {
+            **_usage(),  # all zero -> not in use
+            "category.delete": {"ok": True, "data": None},
+        }
+    )
+    client = TestClient(app)
+    response = client.delete("/categories/1")
+    assert response.status_code == 204
+
+
+def test_delete_in_use_category_returns_409_with_counts(fake_request):
+    fake_request(_usage(transactions=2, allocations=1, templates=0))
+    client = TestClient(app)
+    response = client.delete("/categories/1")
+    assert response.status_code == 409
+    detail = response.json()["detail"]
+    assert "2 transactions" in detail and "1 allocations" in detail
+
+
+def test_erase_history_route_returns_204(fake_request):
+    fake_request(
+        {
+            "transaction.category.purge": {"ok": True, "data": None},
+            "budget.category.purge": {"ok": True, "data": None},
+        }
+    )
+    client = TestClient(app)
+    response = client.post("/categories/1/erase-history")
+    assert response.status_code == 204

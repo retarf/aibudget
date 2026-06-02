@@ -76,6 +76,44 @@ def test_create_with_date_outside_period_raises_422(db):
     assert exc.value.status == 422
 
 
+def test_create_with_mismatched_category_kind_raises_422(db):
+    _seed_budget(db)
+    _seed_category(db)  # category 1 is an expense category
+    with pytest.raises(ServiceError) as exc:
+        _create(db, type="income")
+    assert exc.value.status == 422
+    assert list(db.scalars(select(Transaction))) == []
+
+
+def test_create_with_matching_category_kind_succeeds(db):
+    _seed_budget(db)
+    _seed_income_category(db)  # category 2 is an income category
+    outcome = _create(db, type="income", category_id=2)
+    assert outcome.reply["type"] == "income"
+    assert outcome.event_change == "created"
+
+
+def test_update_to_mismatched_category_kind_raises_422(db):
+    _seed_budget(db)
+    _seed_category(db)  # expense category 1
+    _seed_income_category(db)  # income category 2
+    transaction_id = _create(db).reply["id"]
+    with pytest.raises(ServiceError) as exc:
+        handlers.update_transaction(
+            db,
+            {
+                "transaction_id": transaction_id,
+                "type": "expense",
+                "amount": "25.00",
+                "date": "2026-05-15",
+                "category_id": 2,  # income category under an expense type
+            },
+        )
+    assert exc.value.status == 422
+    fetched = handlers.get_transaction(db, {"transaction_id": transaction_id})
+    assert fetched.reply["category_id"] == 1
+
+
 def test_list_get_update_delete(db):
     _seed_budget(db)
     _seed_category(db)
@@ -196,3 +234,37 @@ def test_summary_categories_decimal_precision(db):
     _create(db, type="expense", amount="7.50", category_id=1)
     outcome = handlers.summarize_by_category(db, {"budget_id": 1})
     assert outcome.reply[0]["expense"] == "20.00"
+
+
+# --- category usage / purge -------------------------------------------------
+
+
+def test_category_usage_counts_transactions(db):
+    _seed_budget(db)
+    _seed_category(db)
+    _create(db)
+    _create(db, amount="5.00")
+    outcome = handlers.category_usage(db, {"category_id": 1})
+    assert outcome.reply == {"transactions": 2}
+
+
+def test_category_usage_zero_for_unused_category(db):
+    outcome = handlers.category_usage(db, {"category_id": 999})
+    assert outcome.reply == {"transactions": 0}
+
+
+def test_purge_category_deletes_its_transactions(db):
+    _seed_budget(db)
+    _seed_category(db)
+    _seed_income_category(db)
+    _create(db, category_id=1)
+    _create(db, type="income", category_id=2)
+    handlers.purge_category(db, {"category_id": 1})
+    remaining = list(db.scalars(select(Transaction)))
+    assert [t.category_id for t in remaining] == [2]
+
+
+def test_purge_category_is_idempotent(db):
+    handlers.purge_category(db, {"category_id": 1})  # nothing to delete
+    outcome = handlers.purge_category(db, {"category_id": 1})
+    assert outcome.reply is None
