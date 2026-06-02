@@ -9,6 +9,7 @@ import type {
   Category,
   CategoryCreate,
   CategoryKind,
+  CategoryWithUsage,
   Template,
   TemplateDetail,
   TemplateItem,
@@ -100,7 +101,7 @@ export const api = {
 
   // --- Categories ---
   listCategories: (kind?: CategoryKind) =>
-    request<Category[]>(`/categories${kind ? `?kind=${kind}` : ""}`),
+    request<CategoryWithUsage[]>(`/categories${kind ? `?kind=${kind}` : ""}`),
   createCategory: (data: CategoryCreate) =>
     request<Category>("/categories", {
       method: "POST",
@@ -108,6 +109,8 @@ export const api = {
     }),
   deleteCategory: (id: number) =>
     request<void>(`/categories/${id}`, { method: "DELETE" }),
+  eraseCategoryHistory: (id: number) =>
+    request<void>(`/categories/${id}/erase-history`, { method: "POST" }),
 
   // --- Templates ---
   listTemplates: () => request<Template[]>("/templates"),

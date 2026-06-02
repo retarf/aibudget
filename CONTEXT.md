@@ -4,7 +4,10 @@
 A named period of time (start_date, end_date) within which a user records transactions. A budget may have zero or more planned allocations.
 
 ## Category
-A global, workspace-wide label for a type of income or expense (e.g. "Groceries", "Salary"). Categories are shared across all budgets and are not scoped to any single budget or template.
+A global, workspace-wide label for a type of income or expense (e.g. "Groceries", "Salary"). Categories are shared across all budgets and are not scoped to any single budget or template. A category is **in use** while any Transaction, Planned Allocation, or Template Line Item references it; an in-use category cannot be deleted.
+
+## Erase History
+A destructive, user-initiated operation on a single Category that removes the category's entire footprint — every Transaction and Planned Allocation that references it in any Budget, and every Template Line Item that references it in any Budget Template. Its purpose is to make an in-use Category unused so it can then be deleted (a separate step). It does not delete the category itself.
 
 ## Transaction
 A recorded financial fact — an income or expense — belonging to a specific budget and referencing a specific category. Transactions represent things that actually happened.

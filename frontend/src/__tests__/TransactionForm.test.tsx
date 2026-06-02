@@ -8,26 +8,40 @@ import { renderWithProviders } from "../test-utils";
 
 const RENT: Category = { id: 7, name: "Rent", kind: "expense" };
 
-describe("inline category creation", () => {
-  test("creates a category inline and selects it", async () => {
+/** Pick the transaction Type from the SegmentedControl. */
+async function chooseType(value: "Income" | "Expense") {
+  await userEvent.click(screen.getByText(value));
+}
+
+describe("TransactionForm", () => {
+  test("disables the category picker until a Type is chosen", async () => {
+    renderWithProviders(
+      <TransactionForm
+        categories={[RENT]}
+        onSubmit={() => {}}
+        onCreateCategory={async () => RENT}
+      />,
+    );
+    expect(screen.getByLabelText("Category")).toBeDisabled();
+    await chooseType("Expense");
+    expect(screen.getByLabelText("Category")).toBeEnabled();
+  });
+
+  test("creates a category inline through the picker and selects it", async () => {
     const onCreateCategory = jest.fn<Promise<Category>, [CategoryCreate]>(
       async () => RENT,
     );
     renderWithProviders(
       <TransactionForm
-        categories={[RENT]}
+        categories={[]}
         onSubmit={() => {}}
         onCreateCategory={onCreateCategory}
       />,
     );
 
-    await userEvent.click(
-      screen.getByRole("button", { name: /new category/i }),
-    );
-    await userEvent.type(await screen.findByLabelText(/^Name/), "Rent");
-    await userEvent.click(
-      screen.getByRole("button", { name: /add category/i }),
-    );
+    await chooseType("Expense");
+    await userEvent.type(screen.getByLabelText("Category"), "Rent");
+    fireEvent.keyDown(screen.getByLabelText("Category"), { key: "Enter" });
 
     await waitFor(() =>
       expect(onCreateCategory).toHaveBeenCalledWith({
@@ -36,37 +50,32 @@ describe("inline category creation", () => {
       }),
     );
     await waitFor(() =>
-      expect(
-        screen.getByRole("combobox", { name: /Category/ }),
-      ).toHaveValue("Rent (expense)"),
+      expect(screen.getByLabelText("Category")).toHaveValue("Rent"),
     );
   });
 
-  test("keeps the other transaction fields across an inline create", async () => {
+  test("a new category inherits the chosen Type's kind", async () => {
     const onCreateCategory = jest.fn<Promise<Category>, [CategoryCreate]>(
-      async () => RENT,
+      async (data) => ({ id: 5, ...data }),
     );
     renderWithProviders(
       <TransactionForm
-        categories={[RENT]}
+        categories={[]}
         onSubmit={() => {}}
         onCreateCategory={onCreateCategory}
       />,
     );
 
-    fireEvent.change(screen.getByLabelText(/^Date/), {
-      target: { value: "2026-05-10" },
-    });
-    await userEvent.click(
-      screen.getByRole("button", { name: /new category/i }),
-    );
-    await userEvent.type(await screen.findByLabelText(/^Name/), "Rent");
-    await userEvent.click(
-      screen.getByRole("button", { name: /add category/i }),
-    );
+    await chooseType("Income");
+    await userEvent.type(screen.getByLabelText("Category"), "Salary");
+    fireEvent.keyDown(screen.getByLabelText("Category"), { key: "Enter" });
 
-    await waitFor(() => expect(onCreateCategory).toHaveBeenCalled());
-    expect(screen.getByLabelText(/^Date/)).toHaveValue("2026-05-10");
+    await waitFor(() =>
+      expect(onCreateCategory).toHaveBeenCalledWith({
+        name: "Salary",
+        kind: "income",
+      }),
+    );
   });
 
   test("reports a duplicate category inline", async () => {
@@ -86,16 +95,10 @@ describe("inline category creation", () => {
       />,
     );
 
-    await userEvent.click(
-      screen.getByRole("button", { name: /new category/i }),
-    );
-    await userEvent.type(await screen.findByLabelText(/^Name/), "Food");
-    await userEvent.click(
-      screen.getByRole("button", { name: /add category/i }),
-    );
+    await chooseType("Expense");
+    await userEvent.type(screen.getByLabelText("Category"), "Food");
+    fireEvent.keyDown(screen.getByLabelText("Category"), { key: "Enter" });
 
-    expect(
-      await screen.findByText(/already exists/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/already exists/i)).toBeInTheDocument();
   });
 });

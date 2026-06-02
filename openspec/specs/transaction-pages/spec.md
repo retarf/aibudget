@@ -16,11 +16,21 @@ A budget's detail view SHALL display all transactions belonging to that budget.
 
 ### Requirement: Record a transaction
 A budget's detail view SHALL let the user record a transaction by entering a
-type, an amount, a date, and a category.
+type, an amount, a date, and a category. The Type SHALL start unselected, and
+the category picker SHALL be disabled until a Type is chosen. Once a Type is
+chosen, only categories of the matching kind SHALL be selectable.
 
 #### Scenario: Transaction recorded
 - **WHEN** the user submits the record form with valid values
 - **THEN** the transaction is created via the API and appears in the list
+
+#### Scenario: Category cannot be chosen before a Type
+- **WHEN** the user opens the record form and has not chosen a Type
+- **THEN** the category picker is disabled and the form cannot be submitted
+
+#### Scenario: Category is limited to the chosen Type's kind
+- **WHEN** the user chooses a Type and opens the category picker
+- **THEN** the picker offers only categories whose kind matches the chosen Type
 
 #### Scenario: Invalid transaction is reported
 - **WHEN** the user submits a transaction the API rejects (e.g. a date outside the budget period)
@@ -40,22 +50,6 @@ confirmation.
 #### Scenario: Transaction deleted
 - **WHEN** the user confirms deletion of a transaction
 - **THEN** the transaction is removed via the API and disappears from the list
-
-### Requirement: Create a category from the transaction form
-The transaction form SHALL let the user create a new category without leaving
-the form, when the category they need does not yet exist.
-
-#### Scenario: Creating a category inline
-- **WHEN** the user opens the add-category control in the transaction form and submits a valid name and kind
-- **THEN** the category is created via the API, the category list refreshes, and the new category becomes the form's selected category
-
-#### Scenario: The transaction form keeps its other values
-- **WHEN** the user creates a category inline while other transaction fields are filled in
-- **THEN** the type, amount, and date already entered remain unchanged
-
-#### Scenario: Duplicate category is reported
-- **WHEN** the user adds a category whose name already exists for that kind
-- **THEN** the API rejection is shown inline and no category is created
 
 ### Requirement: Show a budget's income, expense and net totals
 A budget's detail view SHALL display the budget's total income, total

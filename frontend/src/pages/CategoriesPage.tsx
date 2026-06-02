@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 
 import { ApiError, api } from "../api/client";
-import type { Category, CategoryCreate, CategoryKind } from "../api/types";
+import type { CategoryCreate, CategoryKind, CategoryWithUsage } from "../api/types";
 import { CategoryForm } from "../components/CategoryForm";
 import { useApiResource } from "../hooks/useApiResource";
 
@@ -28,8 +28,10 @@ export function CategoriesPage() {
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
-  const [deleting, setDeleting] = useState<Category | null>(null);
+  const [deleting, setDeleting] = useState<CategoryWithUsage | null>(null);
   const [deleteError, setDeleteError] = useState<string>();
+  const [erasing, setErasing] = useState<CategoryWithUsage | null>(null);
+  const [eraseError, setEraseError] = useState<string>();
 
   async function handleCreate(data: CategoryCreate) {
     setSubmitting(true);
@@ -58,6 +60,20 @@ export function CategoriesPage() {
       setDeleteError(
         err instanceof ApiError ? err.message : "Unexpected error",
       );
+    }
+  }
+
+  async function handleErase() {
+    if (!erasing) {
+      return;
+    }
+    setEraseError(undefined);
+    try {
+      await api.eraseCategoryHistory(erasing.id);
+      setErasing(null);
+      categories.reload();
+    } catch (err) {
+      setEraseError(err instanceof ApiError ? err.message : "Unexpected error");
     }
   }
 
@@ -106,17 +122,35 @@ export function CategoriesPage() {
                 <Table.Td>{category.kind}</Table.Td>
                 <Table.Td>
                   <Group justify="flex-end">
-                    <Button
-                      variant="subtle"
-                      color="red"
-                      size="xs"
-                      onClick={() => {
-                        setDeleteError(undefined);
-                        setDeleting(category);
-                      }}
-                    >
-                      Delete
-                    </Button>
+                    {category.in_use === true && (
+                      <Button
+                        variant="subtle"
+                        color="orange"
+                        size="xs"
+                        onClick={() => {
+                          setEraseError(undefined);
+                          setErasing(category);
+                        }}
+                      >
+                        Erase history
+                      </Button>
+                    )}
+                    {/* Offer Delete only when usage is explicitly known to be
+                        empty; an absent flag (e.g. a stale backend) shows no
+                        destructive action rather than defaulting to deletable. */}
+                    {category.in_use === false && (
+                      <Button
+                        variant="subtle"
+                        color="red"
+                        size="xs"
+                        onClick={() => {
+                          setDeleteError(undefined);
+                          setDeleting(category);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    )}
                   </Group>
                 </Table.Td>
               </Table.Tr>
@@ -156,6 +190,35 @@ export function CategoriesPage() {
             Delete
           </Button>
         </Group>
+      </Modal>
+
+      <Modal
+        opened={erasing !== null}
+        onClose={() => setErasing(null)}
+        title="Erase history"
+      >
+        <Stack gap="sm">
+          <Text>
+            Erase the history of “{erasing?.name}”? This permanently deletes:
+          </Text>
+          <Text size="sm">
+            • {erasing?.usage.transactions ?? 0} transactions
+            <br />• {erasing?.usage.allocations ?? 0} planned allocations
+            <br />• its line items in {erasing?.usage.templates ?? 0} templates
+          </Text>
+          <Text size="sm" c="dimmed">
+            This cannot be undone. Afterwards the category can be deleted.
+          </Text>
+          {eraseError && <Alert color="red">{eraseError}</Alert>}
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setErasing(null)}>
+              Cancel
+            </Button>
+            <Button color="orange" onClick={handleErase}>
+              Erase history
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
     </Stack>
   );
