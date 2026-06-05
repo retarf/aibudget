@@ -12,7 +12,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))  # design/ on the path
 
-from _svglib import BG, ELEV, SURFACE, Svg
+from _svglib import BG, BORDER, SOFT_SHADOW_DEFS, SURFACE, Svg
 from page_budget_detail import draw_modals, draw_page, page_surface_height
 
 CANVAS_W = 1540
@@ -27,13 +27,16 @@ with svg.group("budget-details--dark"):
     svg.rect(0, 0, CANVAS_W, CANVAS_H, BG)
 
     with svg.group("page--budget-detail"):
-        svg.rect(PX, PY, PW, PH, SURFACE, rx=10, stroke=ELEV, sw=1)
+        # Same elevated Paper treatment as app_shell.svg: defined #424242
+        # border + soft drop shadow.
+        svg.rect(PX, PY, PW, PH, SURFACE, rx=10, stroke=BORDER, sw=1,
+                 filt="paper-shadow")
         draw_page(svg, PX, PY, PW)
 
     # Modal frames stacked in a right-hand column.
     draw_modals(svg, PX + PW + 40, 40, 440)
 
-out = svg.render(CANVAS_W, CANVAS_H)
+out = svg.render(CANVAS_W, CANVAS_H, defs=SOFT_SHADOW_DEFS)
 with open(os.path.join(HERE, "budget_details.svg"), "w") as f:
     f.write(out)
 print("Wrote", len(out), "bytes; canvas", CANVAS_W, "x", CANVAS_H)
