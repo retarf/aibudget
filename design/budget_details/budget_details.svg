@@ -2,7 +2,7 @@
 <g id="budget-details--dark">
 <rect x="0" y="0" width="1540" height="1280" rx="0" fill="#1a1a1a"/>
 <g id="page--budget-detail">
-<rect x="40" y="40" width="940" height="1000" rx="10" fill="#242424" stroke="#2e2e2e" stroke-width="1"/>
+<rect x="40" y="40" width="940" height="998" rx="10" fill="#242424" stroke="#2e2e2e" stroke-width="1"/>
 <g id="back-link">
 <text x="72" y="86" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#748ffc" text-anchor="start">← Back to budgets</text>
 </g>
@@ -174,8 +174,8 @@
 <text x="1044" y="1102" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="600" fill="#C9C9C9" text-anchor="start">Delete transaction</text>
 <line x1="1020" y1="1118" x2="1460" y2="1118" stroke="#424242" stroke-width="1"/>
 <text x="1044" y="1154" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">Delete this transaction?</text>
-<rect x="1364" y="1172" width="72" height="36" rx="6" fill="#fa5252"/>
-<text x="1400" y="1195" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Delete</text>
+<rect x="1364" y="1172" width="83" height="36" rx="6" fill="#fa5252"/>
+<text x="1405.5" y="1194.9" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Delete</text>
 <rect x="1274" y="1172" width="83" height="36" rx="6" fill="#2e2e2e" stroke="#424242" stroke-width="1"/>
 <text x="1315.5" y="1194.9" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="500" fill="#C9C9C9" text-anchor="middle">Cancel</text>
 </g>
