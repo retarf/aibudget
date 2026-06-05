@@ -21,6 +21,12 @@ INDIGO_SUB = "#91a7ff"  # subtle primary text (indigo[3])
 RED = "#ff8787"         # subtle red text (red[4])
 RED_FILL = "#fa5252"    # filled red (red[6])
 WHITE = "#ffffff"
+# income/expense row encoding: subtle full-row tint + colored arrow cue
+INCOME_TINT = "#40c057"  # green[6]; applied at low opacity as a row wash
+EXPENSE_TINT = "#fa5252" # red[6]; applied at low opacity as a row wash
+INCOME_ARROW = "#69db7c" # green[4]; ↑ cue
+EXPENSE_ARROW = "#ff8787" # red[4]; ↓ cue
+ROW_TINT_OPACITY = 0.14
 FONT = "Inter, -apple-system, 'Segoe UI', Roboto, sans-serif"
 
 out = []
@@ -85,27 +91,39 @@ def segmented(x, y, w, opts, active=None):
              TEXT if is_active else DIM, 500 if is_active else 400, "middle")
     return h
 
-def table(x, y, cols, rows, action_cells=None, label=None):
+def table(x, y, cols, rows, action_cells=None, row_kinds=None, label=None):
     """cols: list of (header, x_offset, align). rows: list of list[str].
     action_cells: optional list (per row) of callables(rx_right, ry)->None.
+    row_kinds: optional list (per row) of "income"/"expense"/None. When set,
+        the row gets a subtle green/red full-width tint and a colored ↑/↓ cue
+        prefixing the first cell.
     Returns height consumed."""
     cy = y
     if label:
         # aria-label is invisible on real page; skip drawing, keep as layer name only
         pass
     header_h = 40
+    arrow_indent = 22  # space reserved before the first cell for the ↑/↓ cue
+    indent = arrow_indent if row_kinds else 0
     # header
     for (htext, hx, align) in cols:
         anchor = "end" if align == "right" else "start"
-        tx = x + hx
+        tx = x + hx + (indent if hx == 0 and align != "right" else 0)
         text(tx, cy + 24, htext, 13, DIM, 600, anchor)
     cy += header_h
     line(x, cy, x + TABLE_W, cy, BORDER, 1)
     row_h = 44
     for ri, row in enumerate(rows):
+        kind = row_kinds[ri] if row_kinds and ri < len(row_kinds) else None
+        if kind:
+            tint = INCOME_TINT if kind == "income" else EXPENSE_TINT
+            rect(x, cy, TABLE_W, row_h, tint, opacity=ROW_TINT_OPACITY)
+            arrow = "↑" if kind == "income" else "↓"
+            acolor = INCOME_ARROW if kind == "income" else EXPENSE_ARROW
+            text(x, cy + 28, arrow, 15, acolor, 700)
         for (col, (htext, hx, align)) in zip(row, cols):
             anchor = "end" if align == "right" else "start"
-            tx = x + hx
+            tx = x + hx + (indent if hx == 0 and align != "right" else 0)
             text(tx, cy + 28, col, 14, TEXT, 400, anchor)
         if action_cells and ri < len(action_cells) and action_cells[ri]:
             action_cells[ri](x + TABLE_W, cy + 22)
@@ -179,18 +197,18 @@ g_open("summary-table")
 text(CX, SUMMARY_TITLE_Y, "Planned vs actual by category", 13, DIM, 600)
 cols = [
     ("Category", 0, "left"),
-    ("Kind", 240, "left"),
     ("Planned", TABLE_W - 130, "right"),
     ("Actual", TABLE_W, "right"),
 ]
 rows = [
-    ["test", "income", "200.00", "1111.00"],
-    ["computer", "expense", "0.00", "11.00"],
-    ["tettd", "expense", "0.00", "111.00"],
-    ["test", "expense", "100.00", "0.00"],
-    ["boots", "expense", "100.00", "0.00"],
+    ["test", "200.00", "1111.00"],
+    ["computer", "0.00", "11.00"],
+    ["tettd", "0.00", "111.00"],
+    ["test", "100.00", "0.00"],
+    ["boots", "100.00", "0.00"],
 ]
-table(CX, SUMMARY_TABLE_Y, cols, rows)
+row_kinds = ["income", "expense", "expense", "expense", "expense"]
+table(CX, SUMMARY_TABLE_Y, cols, rows, row_kinds=row_kinds)
 g_close()
 
 # Allocation panel
@@ -224,19 +242,19 @@ g_open("transactions-table")
 ttop = ay + 16 + 40 + 3*44 + 36
 tcols = [
     ("Date", 0, "left"),
-    ("Type", 150, "left"),
-    ("Category", 300, "left"),
+    ("Category", 200, "left"),
     ("Amount", TABLE_W - 150, "right"),
 ]
 trows = [
-    ["2026-06-01", "income", "test", "1111.00"],
-    ["2026-06-03", "expense", "computer", "11.00"],
-    ["2026-06-02", "expense", "tettd", "111.00"],
+    ["2026-06-01", "test", "1111.00"],
+    ["2026-06-03", "computer", "11.00"],
+    ["2026-06-02", "tettd", "111.00"],
 ]
+ttypes = ["income", "expense", "expense"]
 def txn_actions(rx_right, ry):
     button(rx_right - 60, ry - 4, "Delete", "subtle-red", "xs")
     button(rx_right - 110, ry - 4, "Edit", "subtle", "xs")
-table(CX, ttop, tcols, trows, action_cells=[txn_actions]*3)
+table(CX, ttop, tcols, trows, action_cells=[txn_actions]*3, row_kinds=ttypes)
 g_close()
 
 g_close()  # page
