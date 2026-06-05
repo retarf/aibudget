@@ -22,4 +22,8 @@ A named, reusable entity containing a set of Template Line Items. Applying a tem
 A (category, planned_amount) pair belonging to a Budget Template. Each category may appear at most once per template. When the referenced category is deleted, the line item is cascade-deleted from the template.
 
 ## Budget Summary
-An aggregate view of a budget showing planned vs actual figures. Includes both aggregate totals (planned income, actual income, planned expense, actual expense, net) and a per-category breakdown. Categories with a planned allocation but no transactions are shown with actual €0. Categories with transactions but no allocation are shown with planned €0.
+An aggregate view of a budget showing planned vs actual figures. Includes both the **Budget Totals** and a per-category breakdown. Categories with a planned allocation but no transactions are shown with actual €0. Categories with transactions but no allocation are shown with planned €0.
+
+## Budget Totals
+The five headline aggregate figures of a Budget Summary: planned income, actual income, planned expense, actual expense, and net (actual income − actual expense). The Budget Totals are the summary's top-line numbers, distinct from its per-category breakdown.
+_Avoid_: totals, summary numbers (when meaning specifically these five figures)

@@ -2,7 +2,7 @@
 <g id="budget-details--dark">
 <rect x="0" y="0" width="1540" height="1280" rx="0" fill="#1a1a1a"/>
 <g id="page--budget-detail">
-<rect x="40" y="40" width="940" height="985" rx="10" fill="#242424" stroke="#2e2e2e" stroke-width="1"/>
+<rect x="40" y="40" width="940" height="1000" rx="10" fill="#242424" stroke="#2e2e2e" stroke-width="1"/>
 <g id="back-link">
 <text x="72" y="86" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#748ffc" text-anchor="start">← Back to budgets</text>
 </g>
@@ -14,103 +14,104 @@
 <g id="date-range">
 <text x="72" y="172" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">2026-06-01 → 2026-06-29</text>
 </g>
-<g id="totals">
-<text x="72" y="212" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Planned income</text>
-<text x="72" y="238" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">200.00</text>
-<text x="247" y="212" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Actual income</text>
-<text x="247" y="238" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">1111.00</text>
-<text x="422" y="212" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Planned expense</text>
-<text x="422" y="238" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">200.00</text>
-<text x="597" y="212" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Actual expense</text>
-<text x="597" y="238" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">122.00</text>
-<text x="772" y="212" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Net</text>
-<text x="772" y="238" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">989.00</text>
+<g id="budget-totals">
+<rect x="72" y="190" width="876" height="88" rx="10" fill="#2e2e2e" stroke="#424242" stroke-width="1"/>
+<text x="96" y="226" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Planned income</text>
+<text x="96" y="252" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">200.00</text>
+<text x="261" y="226" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Actual income</text>
+<text x="261" y="252" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">1111.00</text>
+<text x="426" y="226" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Planned expense</text>
+<text x="426" y="252" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">200.00</text>
+<text x="591" y="226" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Actual expense</text>
+<text x="591" y="252" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">122.00</text>
+<text x="756" y="226" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#828282" text-anchor="start">Net</text>
+<text x="756" y="252" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#C9C9C9" text-anchor="start">989.00</text>
 </g>
 <g id="summary-table">
-<text x="72" y="292" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Planned vs actual by category</text>
-<text x="72" y="332" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Category</text>
-<text x="312" y="332" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Kind</text>
-<text x="818" y="332" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="end">Planned</text>
-<text x="948" y="332" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="end">Actual</text>
-<line x1="72" y1="348" x2="948" y2="348" stroke="#424242" stroke-width="1"/>
-<text x="72" y="376" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
-<text x="312" y="376" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">income</text>
-<text x="818" y="376" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">200.00</text>
-<text x="948" y="376" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">1111.00</text>
-<line x1="72" y1="392" x2="948" y2="392" stroke="#424242" stroke-width="1"/>
-<text x="72" y="420" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">computer</text>
-<text x="312" y="420" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
-<text x="818" y="420" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">0.00</text>
-<text x="948" y="420" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">11.00</text>
-<line x1="72" y1="436" x2="948" y2="436" stroke="#424242" stroke-width="1"/>
-<text x="72" y="464" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">tettd</text>
-<text x="312" y="464" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
-<text x="818" y="464" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">0.00</text>
-<text x="948" y="464" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">111.00</text>
-<line x1="72" y1="480" x2="948" y2="480" stroke="#424242" stroke-width="1"/>
-<text x="72" y="508" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
-<text x="312" y="508" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
-<text x="818" y="508" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">100.00</text>
-<text x="948" y="508" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">0.00</text>
-<line x1="72" y1="524" x2="948" y2="524" stroke="#424242" stroke-width="1"/>
-<text x="72" y="552" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">boots</text>
-<text x="312" y="552" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
-<text x="818" y="552" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">100.00</text>
-<text x="948" y="552" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">0.00</text>
-<line x1="72" y1="568" x2="948" y2="568" stroke="#424242" stroke-width="1"/>
+<text x="72" y="306" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Planned vs actual by category</text>
+<text x="72" y="346" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Category</text>
+<text x="312" y="346" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Kind</text>
+<text x="818" y="346" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="end">Planned</text>
+<text x="948" y="346" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="end">Actual</text>
+<line x1="72" y1="362" x2="948" y2="362" stroke="#424242" stroke-width="1"/>
+<text x="72" y="390" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
+<text x="312" y="390" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">income</text>
+<text x="818" y="390" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">200.00</text>
+<text x="948" y="390" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">1111.00</text>
+<line x1="72" y1="406" x2="948" y2="406" stroke="#424242" stroke-width="1"/>
+<text x="72" y="434" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">computer</text>
+<text x="312" y="434" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
+<text x="818" y="434" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">0.00</text>
+<text x="948" y="434" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">11.00</text>
+<line x1="72" y1="450" x2="948" y2="450" stroke="#424242" stroke-width="1"/>
+<text x="72" y="478" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">tettd</text>
+<text x="312" y="478" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
+<text x="818" y="478" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">0.00</text>
+<text x="948" y="478" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">111.00</text>
+<line x1="72" y1="494" x2="948" y2="494" stroke="#424242" stroke-width="1"/>
+<text x="72" y="522" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
+<text x="312" y="522" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
+<text x="818" y="522" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">100.00</text>
+<text x="948" y="522" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">0.00</text>
+<line x1="72" y1="538" x2="948" y2="538" stroke="#424242" stroke-width="1"/>
+<text x="72" y="566" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">boots</text>
+<text x="312" y="566" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
+<text x="818" y="566" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">100.00</text>
+<text x="948" y="566" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">0.00</text>
+<line x1="72" y1="582" x2="948" y2="582" stroke="#424242" stroke-width="1"/>
 </g>
 <g id="allocation-panel">
-<text x="72" y="596" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" fill="#C9C9C9" text-anchor="start">Planned allocations</text>
-<rect x="823" y="574" width="125" height="28" rx="6" fill="#4c6ef5"/>
-<text x="885.5" y="592.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Add allocation</text>
-<rect x="688" y="574" width="125" height="28" rx="6" fill="#2e2e2e" stroke="#424242" stroke-width="1"/>
-<text x="750.5" y="592.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#C9C9C9" text-anchor="middle">Apply template</text>
-<text x="72" y="636" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Category</text>
-<text x="372" y="636" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Planned amount</text>
-<line x1="72" y1="652" x2="948" y2="652" stroke="#424242" stroke-width="1"/>
-<text x="72" y="680" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
-<text x="372" y="680" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">100.00</text>
-<text x="936" y="688" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400" fill="#ff8787" text-anchor="middle">×</text>
-<text x="908" y="688" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="400" fill="#91a7ff" text-anchor="middle">✎</text>
-<line x1="72" y1="696" x2="948" y2="696" stroke="#424242" stroke-width="1"/>
-<text x="72" y="724" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
-<text x="372" y="724" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">200.00</text>
-<text x="936" y="732" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400" fill="#ff8787" text-anchor="middle">×</text>
-<text x="908" y="732" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="400" fill="#91a7ff" text-anchor="middle">✎</text>
-<line x1="72" y1="740" x2="948" y2="740" stroke="#424242" stroke-width="1"/>
-<text x="72" y="768" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">boots</text>
-<text x="372" y="768" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">100.00</text>
-<text x="936" y="776" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400" fill="#ff8787" text-anchor="middle">×</text>
-<text x="908" y="776" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="400" fill="#91a7ff" text-anchor="middle">✎</text>
-<line x1="72" y1="784" x2="948" y2="784" stroke="#424242" stroke-width="1"/>
+<text x="72" y="610" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" fill="#C9C9C9" text-anchor="start">Planned allocations</text>
+<rect x="823" y="588" width="125" height="28" rx="6" fill="#4c6ef5"/>
+<text x="885.5" y="606.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Add allocation</text>
+<rect x="688" y="588" width="125" height="28" rx="6" fill="#2e2e2e" stroke="#424242" stroke-width="1"/>
+<text x="750.5" y="606.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#C9C9C9" text-anchor="middle">Apply template</text>
+<text x="72" y="650" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Category</text>
+<text x="372" y="650" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Planned amount</text>
+<line x1="72" y1="666" x2="948" y2="666" stroke="#424242" stroke-width="1"/>
+<text x="72" y="694" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
+<text x="372" y="694" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">100.00</text>
+<text x="936" y="702" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400" fill="#ff8787" text-anchor="middle">×</text>
+<text x="908" y="702" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="400" fill="#91a7ff" text-anchor="middle">✎</text>
+<line x1="72" y1="710" x2="948" y2="710" stroke="#424242" stroke-width="1"/>
+<text x="72" y="738" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
+<text x="372" y="738" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">200.00</text>
+<text x="936" y="746" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400" fill="#ff8787" text-anchor="middle">×</text>
+<text x="908" y="746" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="400" fill="#91a7ff" text-anchor="middle">✎</text>
+<line x1="72" y1="754" x2="948" y2="754" stroke="#424242" stroke-width="1"/>
+<text x="72" y="782" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">boots</text>
+<text x="372" y="782" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">100.00</text>
+<text x="936" y="790" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400" fill="#ff8787" text-anchor="middle">×</text>
+<text x="908" y="790" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="400" fill="#91a7ff" text-anchor="middle">✎</text>
+<line x1="72" y1="798" x2="948" y2="798" stroke="#424242" stroke-width="1"/>
 </g>
 <g id="transactions-table">
-<text x="72" y="844" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Date</text>
-<text x="222" y="844" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Type</text>
-<text x="372" y="844" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Category</text>
-<text x="798" y="844" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="end">Amount</text>
-<line x1="72" y1="860" x2="948" y2="860" stroke="#424242" stroke-width="1"/>
-<text x="72" y="888" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">2026-06-01</text>
-<text x="222" y="888" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">income</text>
-<text x="372" y="888" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
-<text x="798" y="888" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">1111.00</text>
-<text x="921.5" y="896.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#ff8787" text-anchor="middle">Delete</text>
-<text x="864.5" y="896.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#91a7ff" text-anchor="middle">Edit</text>
-<line x1="72" y1="904" x2="948" y2="904" stroke="#424242" stroke-width="1"/>
-<text x="72" y="932" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">2026-06-03</text>
-<text x="222" y="932" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
-<text x="372" y="932" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">computer</text>
-<text x="798" y="932" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">11.00</text>
-<text x="921.5" y="940.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#ff8787" text-anchor="middle">Delete</text>
-<text x="864.5" y="940.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#91a7ff" text-anchor="middle">Edit</text>
-<line x1="72" y1="948" x2="948" y2="948" stroke="#424242" stroke-width="1"/>
-<text x="72" y="976" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">2026-06-02</text>
-<text x="222" y="976" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
-<text x="372" y="976" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">tettd</text>
-<text x="798" y="976" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">111.00</text>
-<text x="921.5" y="984.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#ff8787" text-anchor="middle">Delete</text>
-<text x="864.5" y="984.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#91a7ff" text-anchor="middle">Edit</text>
-<line x1="72" y1="992" x2="948" y2="992" stroke="#424242" stroke-width="1"/>
+<text x="72" y="858" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Date</text>
+<text x="222" y="858" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Type</text>
+<text x="372" y="858" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="start">Category</text>
+<text x="798" y="858" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#828282" text-anchor="end">Amount</text>
+<line x1="72" y1="874" x2="948" y2="874" stroke="#424242" stroke-width="1"/>
+<text x="72" y="902" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">2026-06-01</text>
+<text x="222" y="902" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">income</text>
+<text x="372" y="902" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">test</text>
+<text x="798" y="902" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">1111.00</text>
+<text x="921.5" y="910.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#ff8787" text-anchor="middle">Delete</text>
+<text x="864.5" y="910.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#91a7ff" text-anchor="middle">Edit</text>
+<line x1="72" y1="918" x2="948" y2="918" stroke="#424242" stroke-width="1"/>
+<text x="72" y="946" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">2026-06-03</text>
+<text x="222" y="946" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
+<text x="372" y="946" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">computer</text>
+<text x="798" y="946" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">11.00</text>
+<text x="921.5" y="954.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#ff8787" text-anchor="middle">Delete</text>
+<text x="864.5" y="954.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#91a7ff" text-anchor="middle">Edit</text>
+<line x1="72" y1="962" x2="948" y2="962" stroke="#424242" stroke-width="1"/>
+<text x="72" y="990" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">2026-06-02</text>
+<text x="222" y="990" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">expense</text>
+<text x="372" y="990" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="start">tettd</text>
+<text x="798" y="990" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#C9C9C9" text-anchor="end">111.00</text>
+<text x="921.5" y="998.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#ff8787" text-anchor="middle">Delete</text>
+<text x="864.5" y="998.55" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#91a7ff" text-anchor="middle">Edit</text>
+<line x1="72" y1="1006" x2="948" y2="1006" stroke="#424242" stroke-width="1"/>
 </g>
 </g>
 <g id="modal--record-transaction">

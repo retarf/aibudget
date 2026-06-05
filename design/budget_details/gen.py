@@ -126,7 +126,7 @@ rect(0, 0, CANVAS_W, CANVAS_H, BG)
 # -----------------------------------------------------------------------------
 # PAGE FRAME (content only)
 # -----------------------------------------------------------------------------
-PX, PY, PW, PH = 40, 40, 940, 985
+PX, PY, PW, PH = 40, 40, 940, 1000
 PAD = 32
 CX = PX + PAD                 # content left
 CR = PX + PW - PAD            # content right
@@ -152,8 +152,12 @@ g_open("date-range")
 text(CX, PY + 132, "2026-06-01 → 2026-06-29", 14, DIM, 400)
 g_close()
 
-# Totals row (5 stat blocks)
-g_open("totals")
+# Budget totals: the 5 aggregate figures, grouped into a visible card placed
+# directly under the budget name and period.
+g_open("budget-totals")
+CARD_Y = PY + 150
+CARD_H = 88
+rect(CX, CARD_Y, TABLE_W, CARD_H, ELEV, rx=10, stroke=BORDER, sw=1)
 totals = [
     ("Planned income", "200.00"),
     ("Actual income", "1111.00"),
@@ -161,17 +165,18 @@ totals = [
     ("Actual expense", "122.00"),
     ("Net", "989.00"),
 ]
-tx = CX
-ty = PY + 172
+tx = CX + 24
 for lab, val in totals:
-    text(tx, ty, lab, 14, DIM, 400)
-    text(tx, ty + 26, val, 16, TEXT, 500)
-    tx += 175
+    text(tx, CARD_Y + 36, lab, 14, DIM, 400)
+    text(tx, CARD_Y + 62, val, 16, TEXT, 500)
+    tx += 165
 g_close()
 
 # Summary table: Planned vs actual by category
+SUMMARY_TITLE_Y = CARD_Y + CARD_H + 28
+SUMMARY_TABLE_Y = SUMMARY_TITLE_Y + 16
 g_open("summary-table")
-text(CX, PY + 252, "Planned vs actual by category", 13, DIM, 600)
+text(CX, SUMMARY_TITLE_Y, "Planned vs actual by category", 13, DIM, 600)
 cols = [
     ("Category", 0, "left"),
     ("Kind", 240, "left"),
@@ -185,12 +190,12 @@ rows = [
     ["test", "expense", "100.00", "0.00"],
     ["boots", "expense", "100.00", "0.00"],
 ]
-table(CX, PY + 268, cols, rows)
+table(CX, SUMMARY_TABLE_Y, cols, rows)
 g_close()
 
 # Allocation panel
 g_open("allocation-panel")
-ay = PY + 268 + 40 + 5*44 + 28
+ay = SUMMARY_TABLE_Y + 40 + 5*44 + 28
 text(CX, ay, "Planned allocations", 18, TEXT, 700)
 # buttons right-aligned: Apply template (default) + Add allocation (filled)
 addw = int(len("Add allocation") * char_w(13) + 24)
